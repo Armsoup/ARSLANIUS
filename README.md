@@ -30,15 +30,25 @@ Features
 System Structure
 
 ARSLANIUS/
+
   ├─ ARSLANIUS 18.cmd
+  
   ├─ Setting And System Files/
+  
   │   ├─ kernel.dll
+
   │   ├─ REG.cfg
+  
   │   ├─ system.log
+  
   │   └─ systemprofile/
+  
   ├─ Users/
+  
   ├─ Programs/
+  
   └─ RestorePoints/
+  
 
 
 ---
