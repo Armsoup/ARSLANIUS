@@ -5,6 +5,7 @@ Starting from version 16, the project evolves from simple prototypes into a stru
 
 The system can run directly from a USB drive and automatically initializes itself on first launch.
 
+[video](https://youtu.be/iBs5imWNbdo)
 ---
 
 Features
