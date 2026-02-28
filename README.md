@@ -10,7 +10,7 @@ The system can run directly from a USB drive and automatically initializes itsel
 Features
 
 • Boot menu with Safe Mode
-• User accounts: SYSTEM, SYSTEM ADMINISTRATOR, USER, GUEST
+• User accounts: SYSTEM, SYSTEM ADMINISTRATOR, GUEST
 • Access control and privilege elevation
 • Background services (SysPulse, SFC_Daemon)
 • Automatic kernel generation and repair
