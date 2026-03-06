@@ -31,7 +31,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 18.cmd
+  ├─ ARSLANIUS 20.cmd
   
   ├─ Setting And System Files/
   
@@ -59,14 +59,14 @@ Included Versions
 • ARSLANIUS 17 — improved logic and interface
 • ARSLANIUS 18 Release — subsystem model, services, ACL
 • ARSLANIUS 18 SP1 — portable core, improved services, HTML reports
-
-
+• ARSLANIUS 19 - added commands on logon screen 
+• ARSLANIUS 20 - Added Password Encryption, updated ArsStore, passwd and reset
 ---
 
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 18.cmd.
+2. Launch ARSLANIUS 20.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR.
 5. Create a user account.
