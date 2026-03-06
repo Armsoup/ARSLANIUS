@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal enabledelayedexpansion
 title ARSLANIUS 20 Beta 3
 
@@ -779,7 +779,7 @@ goto cmd_loop
 :help
 echo Apps: Notepad, Calc, taskmgr, miner.game, edit, install, regedit, ArsStore, as-pack, as-unpack
 echo System: Help, Logout, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore
-echo Admin: CreatedFolder, MiniDOS, adduser, deluser, alert, Guest, report 
+echo Admin: CreatedFolder, MiniDOS, adduser, deluser, alert, Guest, report, reset, passwd
 goto cmd_loop
 
 :restore_point
