@@ -1,6 +1,7 @@
-﻿@echo off
+﻿
+@echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 20 Beta 3
+title ARSLANIUS 20 Release Candidate
 
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
@@ -13,7 +14,7 @@ set "sys_services=%root_path%\Setting And System Files\systemprofile"
 set "reg_path=%root_path%\Setting And System Files\REG.cfg"
 set "log_path=%root_path%\Setting And System Files\system.log"
 set "restore_root=%root_path%\RestorePoints"
-set "current_build=50.4"
+set "current_build=50.5"
 
 :boot
 set "safe_mode=0"
@@ -71,7 +72,7 @@ set "sys_pass="
 for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM =" "%kernel_path%" 2^>nul') do set "sys_pass=%%a"
 if "%sys_pass%"=="" color 4f & echo [ FATAL ] KERNEL_DATA_CORRUPT & pause & goto bsod
 
-if not exist "%reg_path%" goto repair
+if not exist "%reg_path%" goto bsod 
 for /f "tokens=2 delims==" %%n in ('findstr /i "OS_NAME" "%reg_path%"') do set "os_name=%%n"
 for /f "tokens=2 delims==" %%c in ('findstr /i "SYSTEM_COLOR" "%reg_path%"') do color %%c
 
@@ -316,7 +317,7 @@ echo [ ERROR ] Access denied. & goto cmd_loop
 
 :check_r
 set "is_ok=0"
-for %%a in (Help logout lock ArsStore NoteLite Snake ttt Scanner fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
+for %%a in (Help logout passwd lock ArsStore NoteLite Snake ttt Scanner fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
 
 if "%is_ok%"=="0" (
     if /i "%current_user%"=="SYSTEM" goto core
@@ -459,29 +460,25 @@ pause & goto cmd_loop
 if /i "%current_user%"=="SYSTEM" echo Cannot change SYSTEM password. & pause & goto cmd_loop
 if /i "%current_user%"=="SYSTEM ADMINISTRATOR" echo Cannot change ADMIN password. & pause & goto cmd_loop
 
+set "old_hash="
+for /f "tokens=2 delims==" %%a in ('findstr /i /b "%current_user% =" "%kernel_path%"') do set "old_hash=%%a"
+set "old_hash=!old_hash: =!"
+
 set /p "old=Current password: "
-call :hash "!old!"
-if not "!errorlevel!"=="!stored_hash!" echo Wrong password & pause & goto cmd_loop
+call :hash "!old!" >nul
+if not "!errorlevel!"=="!old_hash!" echo Wrong password & pause & goto cmd_loop
 
 set /p "new1=New password: "
 set /p "new2=Confirm: "
 if not "!new1!"=="!new2!" echo Passwords do not match & pause & goto cmd_loop
 
-call :hash "!new1!"
+call :hash "!new1!" >nul
 set "new_hash=!errorlevel!"
 
-:: Обновить запись в kernel.dll
 set "temp_file=%kernel_path%.tmp"
-(
-    for /f "usebackq tokens=1* delims==" %%a in ("%kernel_path%") do (
-        if /i "%%a"=="%current_user%" (
-            echo %%a = !new_hash!
-        ) else (
-            echo %%a=%%b
-        )
-    )
-) > "!temp_file!"
-move /y "!temp_file!" "%kernel_path%" >nul
+type "%kernel_path%" | findstr /v /i /b "%current_user% =" > "%temp_file%"
+echo %current_user% = !new_hash! >> "%temp_file%"
+move /y "%temp_file%" "%kernel_path%" >nul
 
 echo Password changed.
 pause
