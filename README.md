@@ -77,6 +77,8 @@ Unsupported versions:
 
   These versions are no longer maintained. Please use the latest release (ARSLANIUS 20 RC) for an up-to-date and secure experience.
   
+  What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
+  
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
