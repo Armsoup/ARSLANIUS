@@ -62,7 +62,11 @@ Included Versions
 • ARSLANIUS 19 - added commands on logon screen 
 • ARSLANIUS 20 - Added Password Encryption, updated ArsStore, passwd and reset
 ---
-
+Unsupported versions:
+· ARSLANIUS 16
+· ARSLANIUS 17
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 20 RC) for an up-to-date and secure experience.
+  
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
