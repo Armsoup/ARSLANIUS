@@ -56,15 +56,25 @@ ARSLANIUS/
 Included Versions
 
 • ARSLANIUS 16 — first OS‑level architecture
+
 • ARSLANIUS 17 — improved logic and interface
+
 • ARSLANIUS 18 Release — subsystem model, services, ACL
+
 • ARSLANIUS 18 SP1 — portable core, improved services, HTML reports
+
 • ARSLANIUS 19 - added commands on logon screen 
+
 • ARSLANIUS 20 - Added Password Encryption, updated ArsStore, passwd and reset
+
 ---
+
 Unsupported versions:
+
 · ARSLANIUS 16
+
 · ARSLANIUS 17
+
   These versions are no longer maintained. Please use the latest release (ARSLANIUS 20 RC) for an up-to-date and secure experience.
   
 How to Run
@@ -82,6 +92,7 @@ How to Run
 Requirements
 
 • Windows 7 / 8 / 10 / 11
+
 • CMD with delayed expansion enabled
 
 
