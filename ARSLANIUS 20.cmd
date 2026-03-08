@@ -1,11 +1,12 @@
 ﻿
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 20 Release Candidate
+title ARSLANIUS 20
 
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
+set "current_build=50.6"
 set "kernel_path=%root_path%\Setting And System Files\kernel.dll"
 set "users_root=%root_path%\Users"
 set "programs_root=%root_path%\Programs"
@@ -14,7 +15,6 @@ set "sys_services=%root_path%\Setting And System Files\systemprofile"
 set "reg_path=%root_path%\Setting And System Files\REG.cfg"
 set "log_path=%root_path%\Setting And System Files\system.log"
 set "restore_root=%root_path%\RestorePoints"
-set "current_build=50.5"
 
 :boot
 set "safe_mode=0"
@@ -331,17 +331,17 @@ goto core
 :core_auto
 if /i "%current_user%"=="GUEST" (
     set "ok=0"
-    for %%a in (Help logout report cls ver dir whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help logout support report cls ver dir whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Guest cannot use this command. & goto cmd_loop
 )
 if /i "%safe_mode%"=="1" (
     set "ok=0"
-    for %%a in (Help logout reset report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help logout support reset report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Safe mode. & goto cmd_loop
 )
 if /i NOT "%current_user%"=="SYSTEM" goto exec
 set "ok=0"
-for %%a in (Help reset logout lock report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
+for %%a in (Help reset logout lock support report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
 
 :exec
@@ -775,8 +775,8 @@ goto cmd_loop
 
 :help
 echo Apps: Notepad, Calc, taskmgr, miner.game, edit, install, regedit, ArsStore, as-pack, as-unpack
-echo System: Help, Logout, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore
-echo Admin: CreatedFolder, MiniDOS, adduser, deluser, alert, Guest, report, reset, passwd
+echo System: Help, Logout, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd
+echo Admin: CreatedFolder, MiniDOS, adduser, deluser, alert, Guest, report, reset
 goto cmd_loop
 
 :restore_point
