@@ -75,7 +75,7 @@ Unsupported versions:
 
 · ARSLANIUS 17
 
-  These versions are no longer maintained. Please use the latest release (ARSLANIUS 20 RC) for an up-to-date and secure experience.
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 20) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
   
