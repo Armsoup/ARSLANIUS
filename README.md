@@ -9,17 +9,25 @@ The system can run directly from a USB drive and automatically initializes itsel
 Features
 
 • Boot menu with Safe Mode
+
 • User accounts: SYSTEM, SYSTEM ADMINISTRATOR, GUEST
+
 • Access control and privilege elevation
+
 • Background services (SysPulse, SFC_Daemon)
-• Automatic kernel generation and repair
+
+• Recovery Environment
+
 • Restore Points and System Restore
+
 • ARSLANIUS Archive format (.arc) with pack/unpack tools
-• ArslanScript Interpreter
-• ArslanScript Compiler (as-2-bat)
+
 • ARS Store (application installer)
+
 • HTML‑based system reports
+
 • Portable architecture using %~dp0
+
 • Full event logging
 
 
@@ -29,7 +37,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 20.cmd
+  ├─ ARSLANIUS 21.cmd
   
   ├─ Setting And System Files/
   
@@ -65,6 +73,7 @@ Included Versions
 
 • ARSLANIUS 20 - Added Password Encryption, updated ArsStore, passwd and reset
 
+• ARSLANIUS 21 - Added "reboot_to_recovery" command.
 ---
 
 Unsupported versions:
@@ -73,6 +82,8 @@ Unsupported versions:
 
 · ARSLANIUS 17
 
+· ARSLANIUS 18
+
   These versions are no longer maintained. Please use the latest release (ARSLANIUS 20) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
@@ -80,7 +91,7 @@ Unsupported versions:
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 20.cmd.
+2. Launch ARSLANIUS 21.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR.
 5. Create a user account.
