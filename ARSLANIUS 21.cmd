@@ -1,12 +1,12 @@
 
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 21 Release Candidate
+title ARSLANIUS 21
 
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
-set "current_build=51.1"
+set "current_build=51.2"
 set "kernel_path=%root_path%\Setting And System Files\kernel.dll"
 set "users_root=%root_path%\Users"
 set "programs_root=%root_path%\Programs"
@@ -21,12 +21,12 @@ set "safe_mode=0"
 echo [%date% %time%] LOADER_COMPLETE >> "%log_path%" 2>nul
 color 0f
 cls
-echo ========================================
-echo        %os_name% BOOT MENU
-echo ========================================
+echo ======================================================================================================================
+echo                                                 ARSLANIUS BOOT MENU
+echo ======================================================================================================================
 echo  1. Start ARSLANIUS Normally
 echo  2. Safe Mode (No Services / No Autorun)
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 set /p "boot_choice=Select option (1-2): "
 
 if "%boot_choice%"=="2" (
@@ -38,17 +38,22 @@ if "%boot_choice%"=="2" (
 )
 
 cls
-echo [  WAIT  ] BarOS Kernel 18.0 (%os_name%) starting...
-timeout /t 1 >nul
+echo ======================================================================================================================
+echo                                                 Loading ARSLANIUS 21
+echo         Build: %current_build%
+echo         Kernel: BarOS 18.0
+echo ======================================================================================================================
+
+timeout /t 2 >nul
 
 if exist "%kernel_path%" goto kernel_ok
 color 4f
-echo =====================================================
+echo ======================================================================================================================
 echo [ FATAL ERROR ] KERNEL_NOT_FOUND
 echo.
 echo System core file is missing or corrupted.
 echo Press [R] to Repair System or any other key to Exit.
-echo =====================================================
+echo ======================================================================================================================
 set /p "choice=> "
 if /i "!choice!"=="R" goto bsod 
 exit
@@ -56,9 +61,9 @@ exit
 :repair
 cls
 color 1f
-echo ================================================
-echo     ARSLANIUS 21 RECOVERY ENVIRONMENT
-echo ================================================
+echo ======================================================================================================================
+echo                                             ARSLANIUS RECOVERY ENVIRONMENT
+echo ======================================================================================================================
 echo.
 echo  [1] Startup Repair        - Fix kernel/registry
 echo  [2] System Restore        - Go to restore points
@@ -66,7 +71,7 @@ echo  [3] System Image Recovery - Restore from backup
 echo  [4] Memory Diagnostic     - Check system memory
 echo  [5] Return to boot menu
 echo.
-echo ================================================
+echo ======================================================================================================================
 set /p "recovery_choice=Select option (1-5): "
 
 if "%recovery_choice%"=="1" goto startup_repair
@@ -102,7 +107,7 @@ goto repair
 if not exist "%root_path%\Setting And System Files" md "%root_path%\Setting And System Files"
 if not exist "%restore_root%" (
     echo [ ERROR ] No restore points directory.
-    pause & goto repair
+    pause & goto repair 
 )
 
 echo Available restore points:
@@ -154,9 +159,9 @@ goto repair
 :memory_diag
 cls
 color 1f
-echo ================================================
-echo     ARSLANIUS 21 MEMORY DIAGNOSTIC
-echo ================================================
+echo ======================================================================================================================
+echo                                             ARSLANIUS MEMORY DIAGNOSTIC
+echo ======================================================================================================================
 echo.
 echo Checking for memory problems...
 echo.
@@ -282,13 +287,13 @@ cd /d "%user_home%" 2>nul
 echo [%date% %time%] BOOT_V21_INIT_%current_user% >> "%log_path%" 2>nul
 cls
 color 5b
-echo ========================================
-echo        %os_name% LOCK SCREEN
-echo ========================================
+echo ======================================================================================================================
+echo                                                %os_name% LOCK SCREEN
+echo ======================================================================================================================
 echo Status: Protected / Context: %current_user%
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 echo COMMANDS: Shutdown, Reboot
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 echo.
 set "u_in=" & set "p_in="
 set /p "u_in=Username: "
@@ -335,13 +340,13 @@ if "%safe_mode%"=="0" (
 cls
 if exist "alert.sys" (
     color 4f
-    echo ========================================
-    echo        CRITICAL SYSTEM ALERT
-    echo ========================================
+    echo ======================================================================================================================
+    echo                                                 CRITICAL SYSTEM ALERT
+    echo ======================================================================================================================
     echo.
     type "alert.sys"
     echo.
-    echo ----------------------------------------
+    echo ----------------------------------------------------------------------------------------------------------------------
     echo.
     set /p "ack=Press ENTER to acknowledge and continue..."
     del /f /q "alert.sys"
@@ -354,7 +359,7 @@ if exist "alert.sys" (
 if "%safe_mode%"=="1" color 07
 echo %os_name% [Build %current_build%] - Session: %current_user% ^(SAFE MODE: %safe_mode%^)
 echo Profile: %cd%
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 
 if "%safe_mode%"=="1" goto cmd_loop
 if exist "mail.txt" echo [ MAIL ] You have unread messages! Type "mail-read".
@@ -525,9 +530,9 @@ goto cmd_loop
 
 :dash
 cls
-echo ========================================
-echo        %os_name% CONTROL CENTER
-echo ========================================
+echo ======================================================================================================================
+echo                                                 %os_name% CONTROL CENTER
+echo ======================================================================================================================
 set "u_count=0"
 for /f %%a in ('find /c "=" ^< "%kernel_path%"') do set "u_count=%%a"
 
@@ -547,7 +552,7 @@ echo kernel_path=%kernel_path%
 echo current_build=Build %current_build%
 echo user_home=%user_home%
 echo current_user=%current_user%
-echo ========================================
+echo ======================================================================================================================
 pause
 goto cmd_loop
 
@@ -636,14 +641,14 @@ pause & goto cmd_loop
 
 :eventvwr
 cls
-echo ========================================
-echo        ARSLANIUS EVENT VIEWER
-echo ========================================
+echo ======================================================================================================================
+echo                                                  ARSLANIUS EVENT VIEWER
+echo ======================================================================================================================
 echo [ INFO ] Filtering critical events...
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 findstr /i "ALERT ERROR SFC CRITICAL DELETED SUDO" "%log_path%" 2>nul
 if !errorlevel! NEQ 0 echo [ INFO ] No critical events found.
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 pause
 goto cmd_loop
 
@@ -778,17 +783,17 @@ goto cmd_loop
 
 :fmx
 cls
-echo ========================================
-echo        FILE MANAGER X (ARSLANIUS)
-echo ========================================
+echo ======================================================================================================================
+echo                                                FILE MANAGER X (ARSLANIUS)
+echo ======================================================================================================================
 echo Current directory: %cd%
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 set "f_num=0"
 for %%f in (*.*) do (
     set /a f_num+=1
     echo [ !f_num! ] %%f  (!%%~zf bytes!)
 )
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 echo [0] Exit  [Name] Actions
 set /p "f_choice=Select file name to manage: "
 if "%f_choice%"=="0" goto cmd_loop
@@ -919,14 +924,14 @@ goto cmd_loop
 
 :store
 cls
-echo ========================================
-echo        ARSLANIUS STORE [v2.0]
-echo ========================================
+echo ======================================================================================================================
+echo                                                     ARSLANIUS STORE [v2.0]
+echo ======================================================================================================================
 echo Available Apps:
 echo [ 1 ] System Scanner (Utility)
 echo [ 2 ] NotePad Lite (Office)
 echo [ 0 ] Exit Store
-echo ----------------------------------------
+echo ----------------------------------------------------------------------------------------------------------------------
 set /p "s_choice=Enter App ID to Install: "
 
 if "%s_choice%"=="0" goto cmd_loop
@@ -937,11 +942,9 @@ if not defined app goto store
 
 echo [ WAIT ] Installing %app%...
 
-:: Создаём пустой .bat файл
 if not exist "%programs_root%" md "%programs_root%"
 copy nul "%programs_root%\%app%.bat" >nul
 
-:: Копируем код из метки :app_%app% в файл
 set "start_line="
 set "end_line="
 for /f "tokens=1 delims=:" %%a in ('findstr /n /i ":%label%" "%~f0"') do set /a start_line=%%a
@@ -953,7 +956,6 @@ if not defined start_line (
     goto store
 )
 
-:: Вырезаем строки между start_line и end_line
 (for /f "tokens=1* delims=:" %%a in ('findstr /n "^" "%~f0"') do (
     if %%a gtr !start_line! if %%a lss !end_line! echo %%b
 )) > "%programs_root%\%app%.bat"
@@ -999,14 +1001,14 @@ pause
 exit /b
 
 :start
-cls
-echo ----------------------------------------
-echo 1. Explorer (FMX)    4. Regedit (REG)
-echo 2. Reboot                 5. Control (DASH)
-echo 3. ArsStore              0. Exit Menu
-echo ----------------------------------------
-echo [ Recent Apps: miner.game, notepad ]
-echo ----------------------------------------
+cls 
+echo ----------------------------------------------------------------------------------------------------------------------
+echo                                         1. Explorer (FMX)    4. Regedit (REG)
+echo                                         2. Reboot            5. Control (DASH)
+echo                                         3. ArsStore          0. Exit Menu
+echo ----------------------------------------------------------------------------------------------------------------------
+echo                                         [ Recent Apps: miner.game, notepad ]
+echo ----------------------------------------------------------------------------------------------------------------------
 set /p "win_c=Search or Select: "
 
 if "%win_c%"=="1" goto fmx
