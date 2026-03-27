@@ -81,7 +81,7 @@ Included Versions
 
 • ARSLANIUS 22 - SYSTEM is now BarOS AUTHORITY\SYSTEM, sysinfo added, logging logic updated.
 ---
-• ATTENTION! Support for the versions on which the server version is based will continue until support for that server version is discontinued.
+• ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
 Unsupported versions:
 
