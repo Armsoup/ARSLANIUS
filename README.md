@@ -39,7 +39,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 21.cmd
+  ├─ ARSLANIUS 22.cmd
   
   ├─ Setting And System Files/
   
@@ -76,6 +76,8 @@ Included Versions
 • ARSLANIUS 20 - Added Password Encryption, updated ArsStore, passwd and reset
 
 • ARSLANIUS 21 - Added "reboot_to_recovery" command.
+
+• ARSLANIUS 22 - SYSTEM is now BarOS AUTHORITY\SYSTEM, sysinfo added, logging logic updated.
 ---
 
 Unsupported versions:
@@ -86,14 +88,16 @@ Unsupported versions:
 
 · ARSLANIUS 18
 
-  These versions are no longer maintained. Please use the latest release (ARSLANIUS 21) for an up-to-date and secure experience.
+· ARSLANIUS 19
+
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 22) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
   
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 21.cmd.
+2. Launch ARSLANIUS 22.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR.
 5. Create a user account.
