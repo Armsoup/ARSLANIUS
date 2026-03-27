@@ -97,7 +97,7 @@ echo SYSTEM_COLOR=0e >> "%reg_path%"
 echo ADMIN_COLOR=4f >> "%reg_path%"
 echo USER_COLOR=1f >> "%reg_path%"
 
-echo [%date% %time%] KERNEL_RESTORED_BY_RECOVERY >> "%log_path%" 2>nul
+echo [%date% %time% INFO] KERNEL_RESTORED_BY_RECOVERY >> "%log_path%" 2>nul
 echo.
 echo [ OK ] Startup Repair completed.
 pause
