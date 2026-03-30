@@ -1,12 +1,12 @@
 
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 22 RC
+title ARSLANIUS 22
 
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
-set "current_build=52.2"
+set "current_build=52.3"
 set "kernel_path=%root_path%\Setting And System Files\kernel.dll"
 set "users_root=%root_path%\Users"
 set "programs_root=%root_path%\Programs"
@@ -795,7 +795,7 @@ goto cmd_loop
 :deluser
 echo -- DELETE USER --
 set /p "du=Enter username: "
-if /i "%du%"=="BarOS AUTHORITY\SYSTEM" echo [ ERROR ] Restricted. & goto cmd_loop
+if /i "%du%"=="SYSTEM" echo [ ERROR ] Restricted. & goto cmd_loop
 if /i "%du%"=="SYSTEM ADMINISTRATOR" echo [ ERROR ] Restricted. & goto cmd_loop
 if /i "%du%"=="%current_user%" echo [ ERROR ] Active session. & goto cmd_loop
 type "%kernel_path%" | findstr /v /i /c:"%du% =" > "%kernel_path%.tmp"
