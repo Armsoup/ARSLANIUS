@@ -43,7 +43,7 @@ ARSLANIUS/
 
   ├─ ARSLANIUS 23.cmd
   
-  ├─ Setting And System Files/
+  ├─ Settings And System Files/
   
   │   ├─ kernel.dll
 
