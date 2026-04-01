@@ -53,6 +53,8 @@ ARSLANIUS/
   
   │   └─ installer_19.0/
   
+  │       │
+  
   │       └─ systemprofile/
   
   ├─ Users/
@@ -83,7 +85,7 @@ Included Versions
 
 • ARSLANIUS 22 - SYSTEM is now BarOS AUTHORITY\SYSTEM, sysinfo added, logging logic updated.
 
-• ARSLANIUS 23 - SYSTEM ADMINISTRATOR is now Trusted installer and added backup backup-restore commands.
+• ARSLANIUS 23 - SYSTEM ADMINISTRATOR is now TrustedInstaller and added backup backup-restore commands.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
