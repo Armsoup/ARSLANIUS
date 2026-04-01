@@ -90,7 +90,7 @@ goto recovery_env
 :startup_repair
 echo.
 echo [ WAIT ] Running Startup Repair...
-if not exist "%root_path%\Setting And System Files" md "%root_path%\Setting And System Files"
+if not exist "%root_path%\Settings And System Files" md "%root_path%\Settings And System Files"
 if not exist "%sys_services%" md "%sys_services%" 2>nul
 
 call :hash "Acy98iolop_isArslanius-kop"
@@ -205,7 +205,6 @@ set "user_home=%install_root%"
 if not exist "%user_home%" md "%user_home%" 2>nul
 cd /d "%user_home%" 2>nul
 if not exist "%installer_root%" md "%installer_root%" 2>nul
-if not exist "%sys_services%" md "%sys_services%" 2>nul
 goto logon_screen
 
 :hash
@@ -560,7 +559,7 @@ if /i not "!img_confirm!"=="Y" goto cmd_loop
 echo [ WAIT ] Restoring system image...
 xcopy /e /y "%root_path%\Backup\*" "%root_path%\" >nul 2>&1
 echo [%date% %time%] IMAGE_RESTORE_EXECUTED >> "%log_path%" 2>nul
-echo [ OK ] System image restored. Rebooting...
+echo [ OK ] System image restored. Rebooting…
 pause
 goto boot
 
