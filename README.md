@@ -14,7 +14,7 @@ Features
 
 • Boot menu with Safe Mode
 
-• User accounts: SYSTEM, TrustedInstaller, GUEST
+• User accounts: SYSTEM, SYSTEM ADMINISTRATOR, GUEST
 
 • Access control and privilege elevation
 
@@ -53,8 +53,6 @@ ARSLANIUS/
   
   │   ├─ system.log
   
-  │   ├─ installer_19.0/
-  
   │   └─ systemprofile/
   
   ├─ Users/
@@ -85,7 +83,7 @@ Included Versions
 
 • ARSLANIUS 22 - SYSTEM is now BarOS AUTHORITY\SYSTEM, sysinfo added, logging logic updated.
 
-• ARSLANIUS 23 - SYSTEM ADMINISTRATOR is now TrustedInstaller and added backup backup-restore commands.
+• ARSLANIUS 23 - added backup backup-restore commands.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
@@ -110,7 +108,7 @@ How to Run
 1. Copy the ARSLANIUS folder to any location (USB recommended).
 2. Launch ARSLANIUS 23.cmd.
 3. On first boot, press R to generate the kernel.
-4. Log in as SYSTEM / Acy98iolop_isArslanius-kop
+4. Log in as SYSTEM ADMINISTRATOR / Acy98iolop_isArslanius-kop
 5. Create a user account.
 6. Log in — the system will finish setup automatically.
 
