@@ -1,18 +1,17 @@
 
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 23 RC
+title ARSLANIUS 23
 
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
-set "current_build=53.2"
+set "current_build=53.3"
 set "kernel_path=%root_path%\Settings And System Files\kernel.dll"
-set "installer_root=%root_path%\Settings And System Files\installer_19.0"
 set "users_root=%root_path%\Users"
 set "programs_root=%root_path%\Programs"
-set "sys_prof= %installer_root%\systemprofile"
-set "sys_services=%installer_root%\systemprofile"
+set "sys_prof=%root_path%\Settings And System Files\systemprofile"
+set "sys_services=%root_path%\Settings And System Files\systemprofile"
 set "reg_path=%root_path%\Settings And System Files\REG.cfg"
 set "log_path=%root_path%\Settings And System Files\system.log"
 set "restore_root=%root_path%\RestorePoints"
@@ -96,7 +95,7 @@ if not exist "%sys_services%" md "%sys_services%" 2>nul
 call :hash "Acy98iolop_isArslanius-kop"
 echo SYSTEM = !errorlevel! > "%kernel_path%"
 call :hash "Jiupolaqmn_isArslanius-lo"
-echo TrustedInstaller = !errorlevel! >> "%kernel_path%"
+echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
 
 echo OS_NAME = ARSLANIUS 23 > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
@@ -188,9 +187,9 @@ pause
 goto repair
 
 :kernel_ok
-set "install_pass="
-for /f "tokens=2 delims==" %%a in ('findstr /i /c:"TrustedInstaller =" "%kernel_path%" 2^>nul') do set "install_pass=%%a"
-if "%install_pass%"=="" color 4f & echo [ FATAL ERROR ] KERNEL_DATA_CORRUPT & pause & goto bsod
+set "Admin_pass="
+for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "install_pass=%%a"
+if "%Admin_pass%"=="" color 4f & echo [ FATAL ERROR ] KERNEL_DATA_CORRUPT & pause & goto bsod
 
 set "sys_pass="
 for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM =" "%kernel_path%" 2^>nul') do set "sys_pass=%%a"
@@ -200,11 +199,10 @@ if not exist "%reg_path%" goto bsod
 for /f "tokens=2 delims==" %%n in ('findstr /i "OS_NAME" "%reg_path%"') do set "os_name=%%n"
 for /f "tokens=2 delims==" %%c in ('findstr /i "SYSTEM_COLOR" "%reg_path%"') do color %%c
 
-set "current_user=TrustedInstaller"
-set "user_home=%install_root%"
+set "current_user=SYSTEM"
+set "user_home=%sys_prof%"
 if not exist "%user_home%" md "%user_home%" 2>nul
 cd /d "%user_home%" 2>nul
-if not exist "%installer_root%" md "%installer_root%" 2>nul
 goto logon_screen
 
 :hash
@@ -326,12 +324,10 @@ if NOT "!errorlevel!"=="%stored_hash%" echo [ ERROR ] Password incorrect. & paus
 set "current_user=%u_in%"
 if /i "%current_user%"=="SYSTEM" (set "user_home=%sys_prof%") else (set "user_home=%users_root%\%current_user%")
 
-if /i "%current_user%"=="TrustedInstaller" (set "user_home=%installer_root%")
-if /i "%current_user%"=="TrustedInstaller" set "current_user=BarOS AUTHORITY\TrustedInstaller"
 if /i "%current_user%"=="SYSTEM" set "current_user=BarOS AUTHORITY\SYSTEM"
 if not exist "%user_home%" md "%user_home%" 2>nul
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" set "reg_key=SYSTEM_COLOR" & goto apply_color
-if /i "%current_user%"=="BarOS AUTHORITY\TrustedInstaller" set "reg_key=ADMIN_COLOR" & goto apply_color
+if /i "%current_user%"=="SYSTEM ADMINISTRATOR" set "reg_key=ADMIN_COLOR" & goto apply_color
 set "reg_key=USER_COLOR" & goto apply_color
 
 :apply_color
@@ -401,7 +397,7 @@ if exist "%sys_services%\SFC_Daemon.active" (
             call :hash "Acy98iolop_isArslanius-kop"
 echo SYSTEM = !errorlevel! > "%kernel_path%"
             call :hash "Jiupolaqmn_isArslanius-lo"
-echo TrustedInstaller = !errorlevel! >> "%kernel_path%"
+echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
         )
         echo OS_NAME = %os_name% > "%reg_path%"
         echo SYSTEM_COLOR=0e >> "%reg_path%"
@@ -432,10 +428,10 @@ for /f "tokens=1,2" %%a in ("%cmd%") do (set "f_w=%%a" & set "t_c=%%b")
 if /i NOT "%f_w%"=="sudo" goto check_r
 if "%t_c%"=="" echo Usage: sudo [command] & goto cmd_loop
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" set "ex_c=%t_c%" & goto core
-if /i "%current_user%"=="BarOS AUTHORITY\TrustedInstaller" set "ex_c=%t_c%" & goto core
-set /p "a_p=Enter installer (TrustedInstaller) password: "
+if /i "%current_user%"=="SYSTEM ADMINISTRATOR" set "ex_c=%t_c%" & goto core
+set /p "a_p=Enter ADMIN password: "
 set "admin_hash="
-for /f "tokens=2 delims==" %%s in ('findstr /i /c:"TrustedInstaller =" "%kernel_path%" 2^>nul') do set "admin_hash=%%s"
+for /f "tokens=2 delims==" %%s in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "admin_hash=%%s"
 set "admin_hash=!admin_hash: =!"
 call :hash "!a_p!"
 if "!errorlevel!"=="!admin_hash!" ( 
@@ -450,7 +446,7 @@ for %%a in (Help logout backup backup-restore passwd reboot_to_recovery lock Ars
 
 if "%is_ok%"=="0" (
     if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" goto core
-    if /i "%current_user%"=="BarOS AUTHORITY\TrustedInstaller" goto core
+    if /i "%current_user%"=="SYSTEM ADMINISTRATOR" goto core
     echo Error: Access Denied. Use "sudo %cmd%".
     goto cmd_loop
 )
@@ -468,7 +464,7 @@ if /i "%safe_mode%"=="1" (
     for %%a in (Help logout backup backup-restore sysinfo support reset reboot_to_recovery report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Safe mode. & goto cmd_loop
 )
-if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" goto exec
+if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" goto exec
 set "ok=0"
 for %%a in (Help sysinfo reset backup backup-restore logout lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
@@ -626,7 +622,7 @@ pause & goto cmd_loop
 
 :passwd
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" echo Cannot change SYSTEM password. & pause & goto cmd_loop
-if /i "%current_user%"=="BarOS AUTHORITY\TrustedInstaller" echo Cannot change installer password. & pause & goto cmd_loop
+if /i "%current_user%"=="SYSTEM ADMINISTRATOR" echo Cannot change ADMIN password. & pause & goto cmd_loop
 
 set "old_hash="
 for /f "tokens=2 delims==" %%a in ('findstr /i /b "%current_user% =" "%kernel_path%"') do set "old_hash=%%a"
@@ -769,7 +765,7 @@ echo Canceled.
 goto cmd_loop
 
 :regedit
-if /i NOT "%current_user%"=="BarOS AUTHORITY\TrustedInstaller" if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" (
+if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" (
     echo [ SECURITY ] Access Denied. Only for Admins. & goto cmd_loop
 )
 echo.
@@ -843,7 +839,7 @@ goto cmd_loop
 echo -- DELETE USER --
 set /p "du=Enter username: "
 if /i "%du%"=="SYSTEM" echo [ ERROR ] Restricted. & goto cmd_loop
-if /i "%du%"=="TrustedInstaller" echo [ ERROR ] Restricted. & goto cmd_loop
+if /i "%du%"=="SYSTEM ADMINISTRATOR" echo [ ERROR ] Restricted. & goto cmd_loop
 if /i "%du%"=="%current_user%" echo [ ERROR ] Active session. & goto cmd_loop
 type "%kernel_path%" | findstr /v /i /c:"%du% =" > "%kernel_path%.tmp"
 move /y "%kernel_path%.tmp" "%kernel_path%" >nul
@@ -875,7 +871,7 @@ set /p "m_to=To user: "
 set /p "m_txt=Message: "
 set "dp="
 if /i "%m_to%"=="SYSTEM" set "dp=%sys_prof%"
-if /i "%m_to%"=="TrustedInstaller" set "dp=%installer_root%"
+if /i "%m_to%"=="SYSTEM ADMINISTRATOR" set "dp=%users_root%\SYSTEM ADMINISTRATOR"
 if not defined dp ( if exist "%users_root%\%m_to%\" set "dp=%users_root%\%m_to%" )
 if not defined dp echo [ ERROR ] User folder missing. & goto cmd_loop
 pushd "%dp%"
@@ -921,7 +917,7 @@ goto fmx
 :whoami
 echo Current User: %current_user%
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" echo Permissions: KERNEL
-if /i "%current_user%"=="BarOS AUTHORITY\TrustedInstaller" echo Permissions: ALL
+if /i "%current_user%"=="SYSTEM ADMINISTRATOR" echo Permissions: Administrator
 echo Path: %cd%
 goto cmd_loop
 
@@ -961,7 +957,7 @@ if NOT exist "%kernel_path%" (
     call :hash "Acy98iolop_isArslanius-kop"
 echo SYSTEM = !errorlevel! >> "%kernel_path%"
     call :hash "Jiupolaqmn_isArslanius-lo"
-echo TrustedInstaller = !errorlevel! >> "%kernel_path%"
+echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
 )
 echo OS_NAME = %os_name% > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
