@@ -108,7 +108,7 @@ How to Run
 1. Copy the ARSLANIUS folder to any location (USB recommended).
 2. Launch ARSLANIUS 23.cmd.
 3. On first boot, press R to generate the kernel.
-4. Log in as SYSTEM ADMINISTRATOR / Acy98iolop_isArslanius-kop
+4. Log in as SYSTEM ADMINISTRATOR / Jiupolaqmn_isArslanius-lo
 5. Create a user account.
 6. Log in — the system will finish setup automatically.
 
