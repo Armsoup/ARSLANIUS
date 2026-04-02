@@ -188,7 +188,7 @@ goto repair
 
 :kernel_ok
 set "Admin_pass="
-for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "install_pass=%%a"
+for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "Admin_pass=%%a"
 if "%Admin_pass%"=="" color 4f & echo [ FATAL ERROR ] KERNEL_DATA_CORRUPT & pause & goto bsod
 
 set "sys_pass="
