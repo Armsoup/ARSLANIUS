@@ -47,13 +47,13 @@ ARSLANIUS/
   
   ├─ Settings And System Files/
   
-  │   ├─ kernel.dll
+  │⠀⠀⠀├─ kernel.dll
 
-  │   ├─ REG.cfg
+  │⠀⠀⠀├─ REG.cfg
   
-  │   ├─ system.log
+  │⠀⠀⠀├─ system.log
   
-  │   └─ systemprofile/
+  │⠀⠀⠀└─ systemprofile/
   
   ├─ Users/
   
