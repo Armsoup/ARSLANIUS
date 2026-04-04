@@ -1,4 +1,3 @@
-
 @echo off
 setlocal enabledelayedexpansion
 title ARSLANIUS 25 RC 
@@ -1349,13 +1348,16 @@ goto boot
 
 :bsod
 cls & color 17 & echo :(
+echo.
 echo Your PC has encountered a problem and needs to be restarted. We're collecting some error information, and then the restart will occur.
 echo.
 echo If you call a support person, give them this info:
-if /i "%bsod%"=="1" echo Stop code: KERNEL_NOT_FOUND
-if /i "%bsod%"=="2" echo Stop code: KERNEL_CORRUPTED
-if /i "%bsod%"=="3" echo Stop code: REGISTRY_VERSION_MISMATCH
-if /i "%bsod%"=="4" echo Stop code: REGISTRY_NOT_FOUND
-if /i "%bsod%"=="5" echo Stop code: RESERVED_USERNAME_DETECTED
+if /i "%bsod%"=="1" echo Stop code: KERNEL_NOT_FOUND (0x00000001)
+if /i "%bsod%"=="2" echo Stop code: KERNEL_CORRUPTED (0x00000002)
+if /i "%bsod%"=="3" echo Stop code: REGISTRY_VERSION_MISMATCH (0x00000003)
+if /i "%bsod%"=="4" echo Stop code: REGISTRY_NOT_FOUND (0x00000004)
+if /i "%bsod%"=="5" echo Stop code: RESERVED_USERNAME_DETECTED (0x00000005)
+echo.
+echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
 pause 
 goto repair
