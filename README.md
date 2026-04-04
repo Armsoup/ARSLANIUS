@@ -41,7 +41,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 23.cmd
+  ├─ ARSLANIUS 25.cmd
 
   ├─ Backup/
   
@@ -84,6 +84,10 @@ Included Versions
 • ARSLANIUS 22 - SYSTEM is now BarOS AUTHORITY\SYSTEM, sysinfo added, logging logic updated.
 
 • ARSLANIUS 23 - added backup backup-restore commands.
+
+• ARSLANIUS 24 - missed
+
+• ARSLANIUS 25 - Added cd, ls, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, fixed security bugs, and made the old version of the registry incompatible with the new one.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
@@ -99,14 +103,16 @@ Unsupported versions:
 
 · ARSLANIUS 20
 
-  These versions are no longer maintained. Please use the latest release (ARSLANIUS 23) for an up-to-date and secure experience.
+· ARSLANIUS 21
+
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 25) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
   
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 23.cmd.
+2. Launch ARSLANIUS 25.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR / Jiupolaqmn_isArslanius-lo
 5. Create a user account.
