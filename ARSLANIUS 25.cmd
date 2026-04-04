@@ -486,7 +486,7 @@ if /i "%safe_mode%"=="1" (
 )
 if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" goto exec
 set "ok=0"
-for %%a in (Help sysinfo reset touch mkdir ls cd cat ren backup backup-restore logout lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
+for %%a in (Help sysinfo reset bsod touch mkdir ls cd cat ren backup backup-restore logout lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
 
 :exec
@@ -498,6 +498,7 @@ if /i "%ex_c%"=="ren" goto ren
 if /i "%ex_c%"=="mkdir" goto mkdir
 if /i "%ex_c%"=="chattr" goto chattr
 if /i "%ex_c%"=="touch" goto touch
+if /i "%ex_c%"=="bsod" set "bsod=666" & goto bsod 
 
 :: --- STANDART COMMANDS ---
 if /i "%ex_c%"=="backup" goto system_backup
@@ -1192,7 +1193,7 @@ goto cmd_loop
 :help
 echo Apps: Notepad, Calc, taskmgr, miner.game, edit, install, regedit, ArsStore, as-pack, as-unpack, sysinfo
 echo System: Help, Logout, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch
-echo Admin: MiniDOS, adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr
+echo Admin: MiniDOS, adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod
 goto cmd_loop
 
 :restore_point
@@ -1357,6 +1358,7 @@ if /i "%bsod%"=="2" echo Stop code: KERNEL_CORRUPTED (0x00000002)
 if /i "%bsod%"=="3" echo Stop code: REGISTRY_VERSION_MISMATCH (0x00000003)
 if /i "%bsod%"=="4" echo Stop code: REGISTRY_NOT_FOUND (0x00000004)
 if /i "%bsod%"=="5" echo Stop code: RESERVED_USERNAME_DETECTED (0x00000005)
+if /i "%bsod%"=="666" echo Stop code: MANUAL_CRASH (0xTeam_by_%current_user%)
 echo.
 echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
 pause 
