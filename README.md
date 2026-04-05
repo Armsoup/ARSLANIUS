@@ -1,6 +1,6 @@
 ARSLANIUS — Portable Mini Operating System built on Windows CMD
 
-PLEASE SEND YOUR IDEAS on [Telegram](https://t.me/+8FQ20tOaKI5lNGMy) or [Discussions](https://github.com/Armsoup/ARSLANIUS/Discussions)
+PLEASE SEND YOUR IDEAS on [Telegram](https://t.me/+8FQ20tOaKI5lNGMy) or [Discussions](https://github.com/Armsoup/ARSLANIUS/discussions)
 
 ARSLANIUS is an experimental portable mini‑operating system implemented entirely in Windows Batch (CMD).
 Starting from version 16, the project evolves from simple prototypes into a structured OS‑like environment with its own kernel, registry, user system, services, restore points, and application ecosystem.
