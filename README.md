@@ -1,6 +1,6 @@
 ARSLANIUS — Portable Mini Operating System built on Windows CMD
 
-PLEASE SEND YOUR IDEAS
+PLEASE SEND YOUR IDEAS on [Telegram](https://t.me/+8FQ20tOaKI5lNGMy) or [Discussions](https://github.com/Armsoup/ARSLANIUS/Discussions)
 
 ARSLANIUS is an experimental portable mini‑operating system implemented entirely in Windows Batch (CMD).
 Starting from version 16, the project evolves from simple prototypes into a structured OS‑like environment with its own kernel, registry, user system, services, restore points, and application ecosystem.
@@ -87,7 +87,7 @@ Included Versions
 
 • ARSLANIUS 24 - missed
 
-• ARSLANIUS 25 - Added cd, ls, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, fixed security bugs, and made the old version of the registry incompatible with the new one.
+• ARSLANIUS 25 - Added cd, ls, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, BSoD and hash have been updated, and ARSLANIUS BOOT MANAGER has been added, fixed security bugs, and made the old version of the registry incompatible with the new one.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
