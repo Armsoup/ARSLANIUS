@@ -1,14 +1,15 @@
+
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 25 RC 
+title ARSLANIUS 25 (Service Pack: 1)
 
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
-set "current_build=55.1"
+set "current_build=55.3"
 set "kernel_path=%root_path%\Settings And System Files\kernel.dll"
 set "users_root=%root_path%\Users"
-set "reg_version=25"
+set "reg_version=25.1"
 set "programs_root=%root_path%\Programs"
 set "sys_prof=%root_path%\Settings And System Files\systemprofile"
 set "sys_services=%root_path%\Settings And System Files\systemprofile"
@@ -52,15 +53,26 @@ echo ===========================================================================
 timeout /t 2 >nul
 
 if exist "%kernel_path%" goto kernel_ok
-color 4f
+cls
+color 0f
 echo ======================================================================================================================
-echo [ FATAL ERROR ] KERNEL_NOT_FOUND
+echo                                                 ARSLANIUS BOOT MANAGER
+echo ======================================================================================================================
 echo.
-echo System core file is missing or corrupted.
-echo Press [R] to Repair System or any other key to Exit.
+echo ARSLANIUS failed to start. A recent hardware or software change might be
+echo the cause.
+echo.
+echo Status: 0x00000001
+echo Info: KERNEL_NOT_FOUND
+echo.
+echo File: \Settings And System Files\kernel.dll
+echo.
+echo Press [R] to Repair
+echo Press [Enter] to Exit
+echo.
 echo ======================================================================================================================
 set /p "choice=> "
-if /i "!choice!"=="R" set "bsod=1" & goto bsod 
+if /i "!choice!"=="R" set "bsod=1" & goto bsod
 exit
 
 :repair
@@ -101,6 +113,7 @@ echo OS_NAME = ARSLANIUS 25 > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
 echo ADMIN_COLOR=4f >> "%reg_path%"
 echo USER_COLOR=1f >> "%reg_path%"
+echo ENABLE_LUA=1 >> "%reg_path%"
 echo REG_VERSION=%reg_version% >> "%reg_path%"
 
 echo [%date% %time% INFO] KERNEL_RESTORED_BY_RECOVERY >> "%log_path%" 2>nul
@@ -188,35 +201,153 @@ pause
 goto repair
 
 :kernel_ok
-set "Admin_pass="
-for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "Admin_pass=%%a"
-if "%Admin_pass%"=="" color 4f & echo [ FATAL ERROR ] KERNEL_DATA_CORRUPT & set "bsod=2" & pause & goto bsod
+findstr /i /c:"BarOS AUTHORITY\\SYSTEM =" "%kernel_path%" >nul
+if !errorlevel! EQU 0 (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0x00000005
+    echo Info: RESERVED_USERNAME_DETECTED
+    echo Security violation: Reserved username found in kernel.
+    echo.
+    echo File: \Settings And System Files\kernel.dll
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=5" & goto bsod
+    exit
+)
 
-set "sys_pass="
-for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM =" "%kernel_path%" 2^>nul') do set "sys_pass=%%a"
-if "%sys_pass%"=="" color 4f & echo [ FATAL ERROR ] KERNEL_DATA_CORRUPT & set "bsod=2" & pause & goto bsod
+call :hash "Acy98iolop_isArslanius-kop"
+set "expected_system_hash=!errorlevel!"
+call :hash "Jiupolaqmn_isArslanius-lo"
+set "expected_admin_hash=!errorlevel!"
 
-if not exist "%reg_path%" set "bsod=4" & goto bsod 
+set "system_hash="
+for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM =" "%kernel_path%" 2^>nul') do set "system_hash=%%a"
+set "admin_hash="
+for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "admin_hash=%%a"
+
+set "system_hash=!system_hash: =!"
+set "admin_hash=!admin_hash: =!"
+
+if not "!system_hash!"=="!expected_system_hash!" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0x00000002
+    echo Info: SYSTEM_ACCOUNT_HASH_MISMATCH
+    echo Expected: !expected_system_hash!
+    echo Found: !system_hash!
+    echo.
+    echo File: \Settings And System Files\kernel.dll
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=2" & goto bsod
+    exit
+)
+
+if not "!admin_hash!"=="!expected_admin_hash!" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0x00000006
+    echo Info: ADMIN_ACCOUNT_HASH_MISMATCH
+    echo Expected: !expected_admin_hash!
+    echo Found: !admin_hash!
+    echo.
+    echo File: \Settings And System Files\kernel.dll
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=6" & goto bsod
+    exit
+)
+
+if not exist "%reg_path%" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0x00000004
+    echo Info: REGISTRY_NOT_FOUND
+    echo.
+    echo File: \Settings And System Files\REG.cfg
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=4" & goto bsod
+    exit
+)
+
 for /f "tokens=2 delims==" %%n in ('findstr /i "OS_NAME" "%reg_path%"') do set "os_name=%%n"
 for /f "tokens=2 delims==" %%c in ('findstr /i "SYSTEM_COLOR" "%reg_path%"') do color %%c
 
 set "reg_versions="
 for /f "tokens=2 delims==" %%v in ('findstr /i "REG_VERSION" "%reg_path%" 2^>nul') do set "reg_versions=%%v"
 if not "%reg_versions%"=="%reg_version% " (
-    color 4f
-    echo [ FATAL ERROR ] REGISTRY_VERSION_MISMATCH
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0x00000003
+    echo Info: REGISTRY_VERSION_MISMATCH
     echo Expected: %reg_version%, Found: %reg_versions%
-    echo. & set "bsod=3" & pause & goto bsod
+    echo.
+    echo File: \Settings And System Files\REG.cfg
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=3" & goto bsod
+    exit
 )
-findstr /i /c:"BarOS AUTHORITY\\SYSTEM =" "%kernel_path%" >nul
-if !errorlevel! EQU 0 (
-    color 4f
-    echo [ FATAL ERROR ] RESERVED_USERNAME_DETECTED
-    echo Security violation: Reserved username found in kernel.
-    set "bsod=5"
-    pause
-    goto bsod
-)
+
+set "enable_lua=1"
+for /f "tokens=2 delims==" %%l in ('findstr /i "ENABLE_LUA" "%reg_path%" 2^>nul') do set "enable_lua=%%l"
 
 set "current_user=SYSTEM"
 set "user_home=%sys_prof%"
@@ -302,7 +433,7 @@ for /l %%i in (0,1,50) do (
     if not defined code set "code=66"
     
     set /a "hash_val=hash_val * 31 + code + salt"
-    set /a "hash_val=hash_val %% 1000000"
+    set /a "hash_val=hash_val %% 1000000000"
     set "code="
 )
 :hash_done
@@ -327,8 +458,8 @@ echo.
 set "u_in=" & set "p_in="
 set /p "u_in=Username: "
 
-if /i "%u_in%"=="Shutdown" echo [%date% %time% INFO] SHUTDOWN_FROM_LOGON >> "%log_path%" & exit
-if /i "%u_in%"=="Reboot" echo [%date% %time% INFO] REBOOT_FROM_LOGON >> "%log_path%" & goto boot
+if /i "%u_in%"=="Shutdown" echo [%date% %time% INFO] SHUTDOWN_FROM_LOGON >> "%log_path%" & goto shutdown_screen
+if /i "%u_in%"=="Reboot" echo [%date% %time% INFO] REBOOT_FROM_LOGON >> "%log_path%" & goto reboot_screen
 
 if "%u_in%"=="" goto logon_screen
 set /p "p_in=Password: "
@@ -389,6 +520,8 @@ if exist "alert.sys" (
 if "%safe_mode%"=="1" color 07
 echo %os_name% [Build %current_build%] - Session: %current_user% ^(SAFE MODE: %safe_mode%^)
 echo Profile: %cd%
+echo Have ideas or found a bug? Visit: https://github.com/Armsoup/ARSLANIUS/discussions
+echo Or: https://t.me/+8FQ20tOaKI5lNGMy
 echo ----------------------------------------------------------------------------------------------------------------------
 
 if "%safe_mode%"=="1" goto cmd_loop
@@ -422,6 +555,7 @@ echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
         echo SYSTEM_COLOR=0e >> "%reg_path%"
         echo ADMIN_COLOR=4f >> "%reg_path%"
         echo USER_COLOR=1f >> "%reg_path%"
+        echo ENABLE_LUA=1 >> "%reg_path%"
         echo REG_VERSION=%reg_version% >> "%reg_path%"
         echo [%date% %time% WARNING] BarOS AUTHORITY\SFC_DAEMON: AUTO_REPAIR_SUCCESS >> "%log_path%"
         echo [ SFC_DAEMON ] System restored.
@@ -461,8 +595,10 @@ if "!errorlevel!"=="!admin_hash!" (
 echo [ ERROR ] Access denied. & goto cmd_loop
 
 :check_r
+if "%enable_lua%"=="0 " goto core
+
 set "is_ok=0"
-for %%a in (Help logout mkdir touch backup ls cd cat ren backup-restore passwd reboot_to_recovery lock ArsStore NoteLite Snake sysinfo Scanner fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
+for %%a in (Help logout mkdir cp mv touch backup ls cd cat ren backup-restore passwd reboot_to_recovery lock ArsStore NoteLite Snake sysinfo Scanner fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
 
 if "%is_ok%"=="0" (
     if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" goto core
@@ -481,12 +617,14 @@ if /i "%current_user%"=="GUEST" (
 )
 if /i "%safe_mode%"=="1" (
     set "ok=0"
-    for %%a in (Help logout touch chattr mkdir ls cd cat ren backup backup-restore sysinfo support reset reboot_to_recovery report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help logout mv cp rm touch chattr mkdir ls cd cat ren backup backup-restore sysinfo support reset reboot_to_recovery report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Safe mode. & goto cmd_loop
 )
+
+if "%enable_lua%"=="0 " goto exec
 if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" goto exec
 set "ok=0"
-for %%a in (Help sysinfo reset bsod touch mkdir ls cd cat ren backup backup-restore logout lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
+for %%a in (Help sysinfo cp mv rm reset bsod touch mkdir ls cd cat ren backup backup-restore logout lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
 
 :exec
@@ -499,6 +637,9 @@ if /i "%ex_c%"=="mkdir" goto mkdir
 if /i "%ex_c%"=="chattr" goto chattr
 if /i "%ex_c%"=="touch" goto touch
 if /i "%ex_c%"=="bsod" set "bsod=666" & goto bsod 
+if /i "%ex_c%"=="cp" goto cp
+if /i "%ex_c%"=="rm" goto rm
+if /i "%ex_c%"=="mv" goto mv
 
 :: --- STANDART COMMANDS ---
 if /i "%ex_c%"=="backup" goto system_backup
@@ -686,6 +827,61 @@ for /f %%a in ('find /c "=" ^< "%kernel_path%"') do set "u_count=%%a"
 echo [ STATS ] Registered Users: %u_count%
 echo [ STATS ] OS Name: %os_name%
 echo [ STATS ] Kernel: BarOS 21.0 (V25)
+
+:cp
+set /p "source_file=Source file: "
+if "%source_file%"=="" goto cmd_loop
+if not exist "%source_file%" (
+    echo [ ERROR ] Source file not found.
+    pause
+    goto cmd_loop
+)
+set /p "dest_file=Destination file: "
+if "%dest_file%"=="" goto cmd_loop
+copy "%source_file%" "%dest_file%" >nul 2>&1
+if errorlevel 1 (
+    echo [ ERROR ] Copy failed.
+) else (
+    echo [ OK ] Copied to %dest_file%.
+)
+pause
+goto cmd_loop
+
+:rm
+set /p "target_file=File to delete: "
+if "%target_file%"=="" goto cmd_loop
+if not exist "%target_file%" (
+    echo [ ERROR ] File not found.
+    pause
+    goto cmd_loop
+)
+del /f /q "%target_file%" 2>nul
+if errorlevel 1 (
+    echo [ ERROR ] Delete failed.
+) else (
+    echo [ OK ] Deleted.
+)
+pause
+goto cmd_loop
+
+:mv 
+set /p "source_file=Source file: "
+if "%source_file%"=="" goto cmd_loop
+if not exist "%source_file%" (
+    echo [ ERROR ] Source file not found.
+    pause
+    goto cmd_loop
+)
+set /p "dest_file=Destination file: "
+if "%dest_file%"=="" goto cmd_loop
+move "%source_file%" "%dest_file%" >nul 2>&1
+if errorlevel 1 (
+    echo [ ERROR ] Move failed.
+) else (
+    echo [ OK ] Moved to %dest_file%.
+)
+pause
+goto cmd_loop
 
 echo.
 echo [ SERVICES ]
@@ -891,26 +1087,29 @@ goto cmd_loop
 
 :regedit
 if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" (
-    echo [ SECURITY ] Access Denied. Only for Admins. & goto cmd_loop
+    echo [ SECURITY ] Access Denied. Only for Admins.
+    goto cmd_loop
 )
 echo.
 echo -- SYSTEM CONFIGURATION EDITOR --
-echo Current OS Name: %os_name%
 set /p "new_name=Enter new OS Name (or Enter to skip): "
 if NOT "%new_name%"=="" (
     echo OS_NAME = %new_name% > "%reg_path%"
     echo [ OK ] OS Name updated.
 )
-echo [ 1 ] System Color (0e)
-echo [ 2 ] Admin Color (4f)
-echo [ 3 ] User Color (1f)
-set /p "c_choice=Select color to change (1-3): "
-set /p "c_val=Enter HEX color (ex: 0a): "
+if "%new_name%"=="" (
+    echo OS_NAME = %os_name% > "%reg_path%"
+)
 
-if "%c_choice%"=="1" echo SYSTEM_COLOR=%c_val% >> "%reg_path%"
-if "%c_choice%"=="2" echo ADMIN_COLOR=%c_val% >> "%reg_path%"
-if "%c_choice%"=="3" echo USER_COLOR=%c_val% >> "%reg_path%"
-
+set /p "sys_col=Enter System Color (ex: 0e): "
+if NOT "%sys_col%"=="" echo SYSTEM_COLOR=%sys_col% >> "%reg_path%"
+set /p "adm_col=Enter Admin Color (ex: 4f): "
+if NOT "%adm_col%"=="" echo ADMIN_COLOR=%adm_col% >> "%reg_path%"
+set /p "usr_col=Enter User Color (ex: 1f): "
+if NOT "%usr_col%"=="" echo USER_COLOR=%usr_col% >> "%reg_path%"
+set /p "lua_val=Enter Enable LUA (1=enabled, 0=disabled): "
+if NOT "%lua_val%"=="" echo ENABLE_LUA=%lua_val% >> "%reg_path%"
+echo REG_VERSION=%reg_version% >> "%reg_path%"
 echo [ DONE ] Configuration saved. Reboot to apply changes.
 pause
 goto cmd_loop
@@ -1155,6 +1354,7 @@ echo OS_NAME = %os_name% > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
 echo ADMIN_COLOR=4f >> "%reg_path%"
 echo USER_COLOR=1f >> "%reg_path%"
+echo ENABLE_LUA=1 >> "%reg_path%"
 echo REG_VERSION=%reg_version% >> "%reg_path%"
 
 echo [%date% %time% WARNING] SFC_SILENT_REPAIR_SUCCESS >> "%log_path%"
@@ -1192,8 +1392,8 @@ goto cmd_loop
 
 :help
 echo Apps: Notepad, Calc, taskmgr, miner.game, edit, install, regedit, ArsStore, as-pack, as-unpack, sysinfo
-echo System: Help, Logout, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch
-echo Admin: MiniDOS, adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod
+echo System: Help, Logout, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch, cp, mv
+echo Admin: MiniDOS, adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod, rm
 goto cmd_loop
 
 :restore_point
@@ -1348,18 +1548,150 @@ pause
 goto boot
 
 :bsod
-cls & color 17 & echo :(
-echo.
-echo Your PC has encountered a problem and needs to be restarted. We're collecting some error information, and then the restart will occur.
-echo.
-echo If you call a support person, give them this info:
-if /i "%bsod%"=="1" echo Stop code: KERNEL_NOT_FOUND (0x00000001)
-if /i "%bsod%"=="2" echo Stop code: KERNEL_CORRUPTED (0x00000002)
-if /i "%bsod%"=="3" echo Stop code: REGISTRY_VERSION_MISMATCH (0x00000003)
-if /i "%bsod%"=="4" echo Stop code: REGISTRY_NOT_FOUND (0x00000004)
-if /i "%bsod%"=="5" echo Stop code: RESERVED_USERNAME_DETECTED (0x00000005)
-if /i "%bsod%"=="666" echo Stop code: MANUAL_CRASH (0xTeam_by_%current_user%)
-echo.
-echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
-pause 
-goto repair
+if /i "%bsod%"=="1" (
+   cls
+   color 17
+   echo *** STOP: 0x00000001 [0x00000000, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\kernel.dll
+   echo.
+   echo KERNEL_NOT_FOUND - The system kernel file is missing or corrupted.
+   echo Please reinstall or run Startup Repair to restore the kernel.
+   echo.
+   echo If this is the first time you've seen this error, restart the system.
+   echo If it appears again, run Startup Repair from the recovery environment.
+   echo.
+   echo Technical information:
+   echo *** Address 0x00000001 base at kernel.dll - KERNEL_NOT_FOUND
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+cls
+
+if /i "%bsod%"=="2" (
+   cls
+   color 17
+   echo *** STOP: 0x00000002 [0x00000002, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\kernel.dll
+   echo.
+   echo SYSTEM_ACCOUNT_HASH_MISMATCH - Someone's been playing with kernel.dll in Notepad, huh?
+   echo The SYSTEM account hash doesn't match. Nice try, hacker.
+   echo.
+   echo Technical information:
+   echo *** Expected hash: !expected_system_hash!
+   echo *** Found hash: !system_hash!
+   echo *** Hash mismatch detected in kernel space.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+cls
+
+if /i "%bsod%"=="3" (
+   cls
+   color 17
+   echo *** STOP: 0x00000003 [0x00000003, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\REG.cfg
+   echo.
+   echo REGISTRY_VERSION_MISMATCH - Time traveler detected!
+   echo This registry belongs to another version of ARSLANIUS.
+   echo Your system expects version %reg_version%, but found %reg_versions%.
+   echo.
+   echo Technical information:
+   echo *** Expected version: %reg_version%
+   echo *** Found version: %reg_versions%
+   echo *** Registry version mismatch - possible time paradox.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+cls
+
+if /i "%bsod%"=="4" (
+   cls
+   color 17
+   echo *** STOP: 0x00000004 [0x00000004, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\REG.cfg
+   echo.
+   echo REGISTRY_NOT_FOUND - REG.cfg? Never heard of her.
+   echo The registry is missing. No settings, no colors, no nothing.
+   echo.
+   echo Technical information:
+   echo *** Registry file not found at specified path.
+   echo *** System cannot function without registry configuration.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+cls
+
+if /i "%bsod%"=="5" (
+   cls
+   color 4f
+   echo *** STOP: 0x00000005 [0x00000005, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\kernel.dll
+   echo.
+   echo RESERVED_USERNAME_DETECTED - Security violation!
+   echo Someone tried to create 'BarOS AUTHORITY\SYSTEM' in kernel.dll.
+   echo That's like printing your own "100%% REAL OFFICIAL" dollar bill.
+   echo.
+   echo Technical information:
+   echo *** Reserved username found in kernel space.
+   echo *** System halted to prevent unauthorized access.
+   echo.
+   echo If you call a support specialist, tell him this information so that he can laugh.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+cls
+
+if /i "%bsod%"=="6" (
+   cls
+   color 17
+   echo *** STOP: 0x00000006 [0x00000006, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\kernel.dll
+   echo.
+   echo ADMIN_ACCOUNT_HASH_MISMATCH - Someone tried to give themselves admin privileges the hard way.
+   echo The ADMINISTRATOR hash doesn't match. Spoiler: it didn't work.
+   echo.
+   echo Technical information:
+   echo *** Expected admin hash: !expected_admin_hash!
+   echo *** Found admin hash: !admin_hash!
+   echo *** Access denied. Run Startup Repair to restore sanity.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+cls
+
+if /i "%bsod%"=="666" (
+   cls
+   color 17
+   echo *** STOP: 0xDEADBEEF [0x00000666, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo MANUAL_CRASH - You typed 'bsod' and now you're here. Surprised? You shouldn't be.
+   echo This error was intentionally triggered by the 'bsod' command.
+   echo No real damage was done. Just reboot and continue.
+   echo.
+   echo Technical information:
+   echo *** Crash initiated by user: %current_user%
+   echo *** Stop code: 0xTeam_by_%current_user%
+   echo *** Next time try 'help' instead. Or don't. I'm not your mom.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto boot
+)
