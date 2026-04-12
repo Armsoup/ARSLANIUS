@@ -89,7 +89,7 @@ Included Versions
 
 • ARSLANIUS 25 - Added cd, ls, cv, rm, mv, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, BSoD and hash have been updated, and ARSLANIUS BOOT MANAGER has been added, fixed security bugs, and made the old version of the registry incompatible with the new one.
 
-• ARSLANIUS 26 - Added cp, mv and rm commands, new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
+• ARSLANIUS 26 - Added new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
