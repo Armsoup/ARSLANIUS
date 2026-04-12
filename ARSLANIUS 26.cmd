@@ -899,7 +899,9 @@ for %%a in (Help calc notepad sysinfo cp mv rm reset bsod touch mkdir ls cd cat 
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
 
 :exec
-:: --- NEW COMMANDS V25 ---
+:: --- NEW COMMANDS V26 ---
+
+:: --- STANDART COMMANDS ---
 if /i "%ex_c%"=="ls" goto ls
 if /i "%ex_c%"=="cd" goto cd
 if /i "%ex_c%"=="cat" goto cat
@@ -911,8 +913,6 @@ if /i "%ex_c%"=="bsod" set "bsod=666" & goto bsod
 if /i "%ex_c%"=="cp" goto cp
 if /i "%ex_c%"=="rm" goto rm
 if /i "%ex_c%"=="mv" goto mv
-
-:: --- STANDART COMMANDS ---
 if /i "%ex_c%"=="backup" goto system_backup
 if /i "%ex_c%"=="backup-restore" goto backup_restore
 if /i "%ex_c%"=="sysinfo" goto sysinfo
@@ -1723,9 +1723,9 @@ for /f "usebackq delims=" %%l in ("%arc_sel%") do (
 goto cmd_loop
 
 :help
-echo Apps: Notepad, Calc (Must be installed from ArsStore), taskmgr, miner.game, edit, install, regedit, ArsStore, as-pack, as-unpack, sysinfo
+echo Apps: Notepad, Calc (Must be installed from ArsStore), taskmgr, edit, install, regedit, ArsStore, as-pack, as-unpack, sysinfo
 echo System: Help, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch, cp, mv
-echo Admin: MiniDOS, adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod, rm
+echo Admin: adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod, rm
 goto cmd_loop
 
 :restore_point
