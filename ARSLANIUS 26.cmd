@@ -1188,22 +1188,6 @@ if errorlevel 1 (
 pause
 goto cmd_loop
 
-echo.
-echo [ SERVICES ]
-if exist "%sys_services%\SysPulse.active" (echo  - BarOS AUTHORITY\SysPulse: ONLINE) else (echo  - BarOS AUTHORITY\SysPulse: OFFLINE)
-if exist "%sys_services%\SFC_Daemon.active" (echo  - BarOS AUTHORITY\SFC_Daemon: ONLINE) else (echo  - BarOS AUTHORITY\SFC_Daemon: OFFLINE)
-
-echo.
-echo [ ENV ]
-echo root_path=%root_path%
-echo kernel_path=%kernel_path%
-echo current_build=Build %current_build%
-echo user_home=%user_home%
-echo current_user=%current_user%
-echo ======================================================================================================================
-pause
-goto cmd_loop
-
 :sys_report
 set "lsize=0"
 if exist "%log_path%" for %%i in ("%log_path%") do set "lsize=%%~zi"
