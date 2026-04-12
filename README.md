@@ -2,7 +2,7 @@ ARSLANIUS — Portable Mini Operating System built on Windows CMD
 
 PLEASE SEND YOUR IDEAS on [Telegram](https://t.me/+8FQ20tOaKI5lNGMy) or [Discussions](https://github.com/Armsoup/ARSLANIUS/discussions)
 
-ARSLANIUS is an experimental portable mini‑operating system implemented entirely in Windows Batch (CMD).
+ARSLANIUS is an portable mini‑operating system implemented entirely in Windows Batch (CMD).
 Starting from version 16, the project evolves from simple prototypes into a structured OS‑like environment with its own kernel, registry, user system, services, restore points, and application ecosystem.
 
 [SERVER VERSION](https://github.com/Armsoup/ARSLANIUS_Server)
@@ -41,7 +41,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 25.cmd
+  ├─ ARSLANIUS 26.cmd
 
   ├─ Backup/
   
@@ -88,6 +88,8 @@ Included Versions
 • ARSLANIUS 24 - missed
 
 • ARSLANIUS 25 - Added cd, ls, cv, rm, mv, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, BSoD and hash have been updated, and ARSLANIUS BOOT MANAGER has been added, fixed security bugs, and made the old version of the registry incompatible with the new one.
+
+• ARSLANIUS 26 - Added cp, mv and rm commands, new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
@@ -105,14 +107,16 @@ Unsupported versions:
 
 · ARSLANIUS 21
 
-  These versions are no longer maintained. Please use the latest release (ARSLANIUS 25) for an up-to-date and secure experience.
+· ARSLANIUS 23
+
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 26) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
   
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 25.cmd.
+2. Launch ARSLANIUS 26.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR / Jiupolaqmn_isArslanius-lo
 5. Create a user account.
