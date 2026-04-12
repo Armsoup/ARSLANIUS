@@ -87,7 +87,7 @@ Included Versions
 
 • ARSLANIUS 24 - missed
 
-• ARSLANIUS 25 - Added cd, ls, cv, rm, mv, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, BSoD and hash have been updated, and ARSLANIUS BOOT MANAGER has been added, fixed security bugs, and made the old version of the registry incompatible with the new one.
+• ARSLANIUS 25 - Added cd, ls, cp, rm, mv, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, BSoD and hash have been updated, and ARSLANIUS BOOT MANAGER has been added, fixed security bugs, and made the old version of the registry incompatible with the new one.
 
 • ARSLANIUS 26 - Added new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
 ---
