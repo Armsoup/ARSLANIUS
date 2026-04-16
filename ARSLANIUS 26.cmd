@@ -1,13 +1,14 @@
-
+﻿
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 26 RC
+title ARSLANIUS 26
 
 :boot
+color 0f
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
-set "current_build=56.1"
+set "current_build=56.2"
 set "kernel_path=%root_path%\Settings And System Files\kernel.dll"
 set "users_root=%root_path%\Users"
 set "reg_version=26"
@@ -23,39 +24,84 @@ if exist "%root_path%\Setting And System Files" (
     )
 )
 
+set "boot_timeout=30"
+set "default_mode=1"
 set "boot_choice="
 set "safe_mode=0"
-echo [%date% %time% INFO] LOADER_COMPLETE >> "%log_path%" 2>nul
-color 0f
 set "rec=0"
+set "diagnostic=0"
+set "last_successful_mode=1"
+
+if exist "%root_path%\Settings And System Files\BCD" (
+    for /f "tokens=1,* delims==" %%a in ('type "%root_path%\Settings And System Files\BCD" 2^>nul') do (
+        if "%%a"=="BOOT_TIMEOUT" set "boot_timeout=%%b"
+        if "%%a"=="DEFAULT_MODE" set "default_mode=%%b"
+        if "%%a"=="LAST_SUCCESSFUL_MODE" set "last_successful_mode=%%b"
+    )
+)
+
 cls
 echo ======================================================================================================================
 echo                                                 ARSLANIUS BOOT MANAGER 
 echo ======================================================================================================================
+if %last_successful_mode% NEQ 0 (
+    echo  Last Known Good Configuration [Mode %last_successful_mode%]
+)
 echo  1. Start ARSLANIUS Normally
 echo  2. Safe Mode (No Services / No Autorun)
 echo  3. Recovery Environment 
+echo  4. Diagnostic Mode LOCAL
+echo  5. Diagnostic Mode NETWORK
 echo ----------------------------------------------------------------------------------------------------------------------
-set /p "boot_choice=Select option (1-3): "
+echo  Auto-boot in %boot_timeout% seconds...
+echo ======================================================================================================================
+
+choice /C 12345 /N /T %boot_timeout% /D %default_mode% /M "Select option (1-5): "
+set "boot_choice=%errorlevel%"
+
+if "%boot_choice%"=="1" (
+    cls
+    echo ======================================================================================================================
+    echo                                                 Loading ARSLANIUS 26
+    echo         Build: %current_build%
+    echo         Kernel: BarOS 22.0
+    echo ======================================================================================================================
+    timeout /t 2 >nul
+)
 
 if "%boot_choice%"=="2" (
-    cls
-    color 0f
-    set "safe_mode=1"
-    echo ======================================================================================================================
-    echo                          ARSLANIUS BOOT MANAGER
-    echo ======================================================================================================================
-    echo Loaded: \Settings And System Files\kernel.dll
-    timeout /t 1 >nul
-    echo Loaded: \Settings And System Files\REG.cfg
-    timeout /t 1 >nul
-    echo Loaded: \Settings And System Files\systemprofile
-    timeout /t 1 >nul
-    echo.
-    echo [ INFO ] Safe Mode enabled.
-    timeout /t 1 >nul
-    del /f /q "%sys_services%\SysPulse.active"
-    del /f /q "%sys_services%\SFC_Daemon.active"
+    if NOT "%boot_choice%"=="1" if NOT "%boot_choice%"=="3" if NOT "%boot_choice%"=="4" if NOT "%boot_choice%"=="5" (
+        cls
+        color 0f
+        set "safe_mode=1"
+        echo ======================================================================================================================
+        echo                                                 ARSLANIUS BOOT MANAGER
+        echo ======================================================================================================================
+        if NOT exist %root_path%\Settings And System Files" 2>nul (
+            echo ...
+        )
+        if exist "%root_path%\Settings And System Files\BCD" 2>nul (
+            echo Loaded: \Settings And System Files\BCD
+        )
+        if exist "%kernel_path%" 2>nul (
+            echo Loaded: \Settings And System Files\kernel.dll
+        )
+        timeout /t 1 >nul
+        if exist "%kernel_path%" 2>nul (
+            echo Loaded: \Settings And System Files\REG.cfg
+        )
+        timeout /t 1 >nul
+        if exist "%sys_services%" 2>nul (
+            echo Loaded: \Settings And System Files\systemprofile
+        )
+        timeout /t 1 >nul
+        echo.
+        echo [ INFO ] Safe Mode enabled.
+        timeout /t 1 >nul
+        del /f /q "%sys_services%\SysPulse.active" 2>nul
+        del /f /q "%sys_services%\SFC_Daemon.active" 2>nul
+        del /f /q "%sys_services%\NetMonitor.active" 2>nul
+    )
 )
 
 if "%boot_choice%"=="3" (
@@ -80,17 +126,127 @@ if "%boot_choice%"=="3" (
     timeout /t 1 >nul
     del /f /q "%sys_services%\SysPulse.active"
     del /f /q "%sys_services%\SFC_Daemon.active"
+    del /f /q "%sys_services%\NetMonitor.active"
     goto repair
 )
 
-cls
-echo ======================================================================================================================
-echo                                                 Loading ARSLANIUS 26
-echo         Build: %current_build%
-echo         Kernel: BarOS 22.0
-echo ======================================================================================================================
+if "%boot_choice%"=="4" (
+    timeout /t 1 >nul
+    cls 
+    echo .
+    timeout /t 1 >nul
+    cls
+    echo ..
+    timeout /t 1 >nul
+    cls
+    echo ...
+    timeout /t 1 >nul
+    cls 
+    echo .
+    timeout /t 1 >nul
+    cls
+    del /f /q "%sys_services%\SFC_Daemon.active"
+    del /f /q "%sys_services%\NetMonitor.active"
+    set "diagnostic=1"
+    goto interface
+)
 
-timeout /t 2 >nul
+if "%boot_choice%"=="5" (
+    timeout /t 1 >nul
+    cls 
+    echo .
+    timeout /t 1 >nul
+    cls
+    echo ..
+    timeout /t 1 >nul
+    cls
+    echo ...
+    timeout /t 1 >nul
+    cls 
+    echo .
+    timeout /t 1 >nul
+    cls
+    del /f /q "%sys_services%\SFC_Daemon.active"
+    del /f /q "%sys_services%\SysPulse.active"
+    set "diagnostic=2"
+    goto interface
+)
+
+if NOT exist "%root_path%\Settings And System Files" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000001a
+    echo Info: CONFIG_ROOT_NOT_FOUND
+    echo.
+    echo File: \Settings And System Files
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=1a" & goto bsod
+    exit
+)
+
+if not exist "%root_path%\Settings And System Files\BCD" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000014
+    echo Info: BCD_NOT_FOUND
+    echo.
+    echo File: \Settings And System Files\BCD
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" goto repair 
+    exit
+)
+
+set "bcd_error=0"
+findstr /i "BOOT_TIMEOUT" "%root_path%\Settings And System Files\BCD" >nul || set "bcd_error=1"
+findstr /i "DEFAULT_MODE" "%root_path%\Settings And System Files\BCD" >nul || set "bcd_error=1"
+
+if %bcd_error% EQU 1 (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000013
+    echo Info: BCD_CORRUPTED
+    echo.
+    echo File: \Settings And System Files\BCD
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" goto repair
+    exit
+)
 
 if exist "%kernel_path%" goto kernel_ok
 cls
@@ -115,7 +271,60 @@ set /p "choice=> "
 if /i "!choice!"=="R" set "bsod=1" & goto bsod
 exit
 
+if not exist "%root_path%\Settings And System Files\BCD" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000014
+    echo Info: BCD_NOT_FOUND
+    echo.
+    echo File: \Settings And System Files\BCD
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" goto repair
+    exit
+)
+
+set "bcd_error=0"
+findstr /i "BOOT_TIMEOUT" "%root_path%\Settings And System Files\BCD" >nul || set "bcd_error=1"
+findstr /i "DEFAULT_MODE" "%root_path%\Settings And System Files\BCD" >nul || set "bcd_error=1"
+
+if %bcd_error% EQU 1 (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000013
+    echo Info: BCD_CORRUPTED
+    echo.
+    echo File: \Settings And System Files\BCD
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" goto repair
+    exit
+)
+
 :repair
+set "diagnostic=0"
 set "rec=0"
 cls
 color 1f
@@ -147,10 +356,8 @@ echo [ WAIT ] Running Startup Repair...
 if not exist "%root_path%\Settings And System Files" md "%root_path%\Settings And System Files"
 if not exist "%sys_services%" md "%sys_services%" 2>nul
 
-call :hash "Acy98iolop_isArslanius-kop"
-echo SYSTEM = !errorlevel! > "%kernel_path%"
-call :hash "Jiupolaqmn_isArslanius-lo"
-echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
+echo SYSTEM = -414170332 > "%kernel_path%"
+echo SYSTEM ADMINISTRATOR = 156593571 >> "%kernel_path%"
 
 timeout /t 1 >nul
 cls 
@@ -173,6 +380,12 @@ echo ...
 timeout /t 1 >nul
 
 if exist "%sys_services%\*.cnt" del /f /q "%sys_services%\*.cnt"
+
+echo BOOT_TIMEOUT=30 > "%root_path%\Settings And System Files\BCD"
+echo DEFAULT_MODE=1 >> "%root_path%\Settings And System Files\BCD"
+echo LAST_SUCCESSFUL_MODE=1 >> "%root_path%\Settings And System Files\BCD"
+echo BOOT_COUNT=0 >> "%root_path%\Settings And System Files\BCD"
+echo LAST_BOOT_SUCCESS=%date% >> "%root_path%\Settings And System Files\BCD"
 
 echo OS_NAME = ARSLANIUS 26 > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
@@ -396,10 +609,10 @@ if !admin_ok! EQU 0 (
     exit
 )
 
-call :hash "Acy98iolop_isArslanius-kop"
-set "expected_system_hash=!errorlevel!"
-call :hash "Jiupolaqmn_isArslanius-lo"
-set "expected_admin_hash=!errorlevel!"
+set "net_check_counter=0"
+
+set "expected_system_hash=-414170332"
+set "expected_admin_hash=156593571"
 
 set "system_hash="
 for /f "tokens=2 delims==" %%a in ('findstr /i /c:"SYSTEM =" "%kernel_path%" 2^>nul') do set "system_hash=%%a"
@@ -548,6 +761,33 @@ if not "%reg_versions%"=="%reg_version% " (
     exit
 )
 
+set "registrysize=0"
+if exist "%reg_path%" for %%i in ("%reg_path%") do set "registrysize=%%~zi"
+
+if %registrysize% GEQ 2048 (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000011
+    echo Info: REGISTRY_LOCKED
+    echo.
+    echo File: \Settings And System Files\REG.cfg
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=11" & goto bsod
+    exit
+)
+
 set "kernelsize=0"
 if exist "%kernel_path%" for %%i in ("%kernel_path%") do set "kernelsize=%%~zi"
 
@@ -572,6 +812,33 @@ if %kernelsize% GEQ 12288 (
     echo ======================================================================================================================
     set /p "choice=> "
     if /i "!choice!"=="R" set "bsod=10" & goto bsod
+    exit
+)
+
+set "logsize=0"
+if exist "%log_path%" for %%i in ("%log_path%") do set "logsize=%%~zi"
+
+if %logsize% GEQ 153600 (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000012
+    echo Info: LOG_OVERFLOW
+    echo.
+    echo File: \Settings And System Files\system.log
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=12" & goto bsod
     exit
 )
 
@@ -670,6 +937,17 @@ echo %hash_val%
 exit /b %hash_val%
 
 :logon_screen
+set "current_mode=%boot_choice%"
+if "%rec%"=="1" set "current_mode=3"
+if "%diagnostic%"=="1" set "current_mode=4"
+if "%diagnostic%"=="2" set "current_mode=5"
+
+echo BOOT_TIMEOUT=%boot_timeout% > "%root_path%\Settings And System Files\BCD"
+echo DEFAULT_MODE=%default_mode% >> "%root_path%\Settings And System Files\BCD"
+echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%root_path%\Settings And System Files\BCD"
+echo BOOT_COUNT=%boot_count% >> "%root_path%\Settings And System Files\BCD"
+echo LAST_BOOT_SUCCESS=%date% >> "%root_path%\Settings And System Files\BCD"
+
 set "u_in=" & set "p_in="
 set "current_user=SYSTEM"
 set "user_home=%sys_prof%"
@@ -735,10 +1013,15 @@ cd /d "%user_home%" 2>nul
 
 :interface
 if "%rec%"=="1" set "current_user=BarOS AUTHORITY\SYSTEM"
-if "%safe_mode%"=="0" (
+if "%safe_mode%"=="0" if "%rec%"=="0" if "%diagnostic%"=="0" (
     if not exist "%sys_services%\SysPulse.active" (
         echo [ KERNEL ] Booting background service: BarOS AUTHORITY\SysPulse...
         echo RUNNING > "%sys_services%\SysPulse.active" 2>nul
+        timeout /t 1 >nul
+    )
+    if not exist "%sys_services%\NetMonitor.active" (
+        echo [ KERNEL ] Booting background service: BarOS AUTHORITY\NetMonitor...
+        echo RUNNING > "%sys_services%\NetMonitor.active" 2>nul
         timeout /t 1 >nul
     )
     if not exist "%sys_services%\SFC_Daemon.active" (
@@ -748,9 +1031,43 @@ if "%safe_mode%"=="0" (
     )
 )
 if "%rec%"=="1" (
-    set "current_user=BarOS AUTHORITY\SYSTEM"
+    if not exist "%sys_services%\SFC_Daemon.active" (
+        echo [ KERNEL ] Booting background service: BarOS AUTHORITY\SFC_Daemon...
+        echo RUNNING > "%sys_services%\SFC_Daemon.active" 2>nul
+        timeout /t 1 >nul
+    )
+    set "current_user=BarOS AUTHORITY\SFC_Daemon"
     del /f /q "%sys_services%\SysPulse.active"
+    del /f /q "%sys_services%\NetMonitor.active"
+    if not exist "%sys_services%\SFC_Daemon" md "%sys_services%\SFC_Daemon"
+    set "user_home=%sys_services%\SFC_Daemon"
+    cd /d "%sys_services%\SFC_Daemon"
+)
+if "%diagnostic%"=="1" (
+    if not exist "%sys_services%\SysPulse.active" (
+        echo [ KERNEL ] Booting background service: BarOS AUTHORITY\SysPulse...
+        echo RUNNING > "%sys_services%\SysPulse.active" 2>nul
+        timeout /t 1 >nul
+    )
+    set "current_user=BarOS AUTHORITY\SysPulse"
     del /f /q "%sys_services%\SFC_Daemon.active"
+    del /f /q "%sys_services%\NetMonitor.active"
+    if not exist "%sys_services%\SysPulse" md "%sys_services%\SysPulse"
+    set "user_home=%sys_services%\SysPulse"
+    cd /d "%sys_services%\SysPulse"
+)
+if "%diagnostic%"=="2" (
+    if not exist "%sys_services%\NetMonitor.active" (
+        echo [ KERNEL ] Booting background service: BarOS AUTHORITY\NetMonitor...
+        echo RUNNING > "%sys_services%\NetMonitor.active" 2>nul
+        timeout /t 1 >nul
+    )
+    set "current_user=BarOS AUTHORITY\NetMonitor"
+    del /f /q "%sys_services%\SFC_Daemon.active"
+    del /f /q "%sys_services%\SysPulse.active"
+    if not exist "%sys_services%\NetMonitor" md "%sys_services%\NetMonitor"
+    set "user_home=%sys_services%\NetMonitor"
+    cd /d "%sys_services%\NetMonitor"
 )
 
 cls
@@ -772,7 +1089,9 @@ if exist "alert.sys" (
     goto interface
 )
 
-if "%rec%"=="1" color 07
+if "%diagnostic%"=="2" color 0e
+if "%diagnostic%"=="1" color 0e
+if "%rec%"=="1" color 0e
 if "%safe_mode%"=="1" color 07
 echo %os_name% [Build %current_build%] - Session: %current_user% ^(SAFE MODE: %safe_mode%^)
 echo Profile: %cd%
@@ -782,6 +1101,8 @@ echo ---------------------------------------------------------------------------
 
 if "%safe_mode%"=="1" goto cmd_loop
 if "%rec%"=="1" goto cmd_loop
+if "%diagnostic%"=="1" goto cmd_loop
+if "%diagnostic%"=="2" goto cmd_loop
 if exist "mail.txt" echo [ MAIL ] You have unread messages! Type "mail-read".
 if exist "autorun.txt" (
     for /f "tokens=*" %%a in (autorun.txt) do (
@@ -794,6 +1115,8 @@ if exist "autorun.txt" (
 :cmd_loop
 if "%rec%"=="1" goto skip_all_services
 if "%safe_mode%"=="1" goto skip_all_services
+if "%diagnostic%"=="1" goto skip_all_services
+if "%diagnostic%"=="2" goto skip_all_services
 
 if exist "%sys_services%\SFC_Daemon.active" (
     set "sfc_err=0"
@@ -804,10 +1127,8 @@ if exist "%sys_services%\SFC_Daemon.active" (
         echo [ BarOS AUTHORITY\SFC_DAEMON ] Integrity violation detected!
         echo [ BarOS AUTHORITY\SFC_DAEMON ] Executing background repair...
         if NOT exist "%kernel_path%" (
-            call :hash "Acy98iolop_isArslanius-kop"
-echo SYSTEM = !errorlevel! > "%kernel_path%"
-            call :hash "Jiupolaqmn_isArslanius-lo"
-echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
+            echo SYSTEM = -414170332 > "%kernel_path%"
+            echo SYSTEM ADMINISTRATOR = 156593571 >> "%kernel_path%"
         )
         echo OS_NAME = %os_name% > "%reg_path%"
         echo SYSTEM_COLOR=0e >> "%reg_path%"
@@ -833,6 +1154,20 @@ if exist "%sys_services%\SysPulse.active" (
     if "%pulse_check%"=="5" echo [%date% %time% INFO] BarOS AUTHORITY\SYSPULSE: System Health OK >> "%log_path%"
 )
 
+if exist "%sys_services%\NetMonitor.active" (
+    set /a "net_check=%random% %% 10"
+    if "%net_check%"=="5" (
+        ping -n 1 github.com >nul 2>&1
+        if errorlevel 1 (
+            echo BarOS AUTHORITY\NETMONITOR: OFFLINE 
+            echo [%date% %time% INFO] BarOS AUTHORITY\NETMONITOR: OFFLINE >> "%log_path%"
+        ) else (
+            echo BarOS AUTHORITY\NETMONITOR: ONLINE 
+            echo [%date% %time% INFO] BarOS AUTHORITY\NETMONITOR: ONLINE >> "%log_path%"
+        )
+    )
+)
+
 :skip_all_services
 cd /d "%user_home%" 2>nul
 set "cmd="
@@ -847,6 +1182,9 @@ if /i NOT "%f_w%"=="sudo" goto check_r
 if "%t_c%"=="" echo Usage: sudo [command] & goto cmd_loop
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" set "ex_c=%t_c%" & goto core
 if /i "%current_user%"=="SYSTEM ADMINISTRATOR" set "ex_c=%t_c%" & goto core
+if /i "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" set "ex_c=%t_c%" & goto core
+if /i "%current_user%"=="BarOS AUTHORITY\SysPulse" set "ex_c=%t_c%" & goto core
+if /i "%current_user%"=="BarOS AUTHORITY\NetMonitor" set "ex_c=%t_c%" & goto core
 set /p "a_p=Enter ADMIN password: "
 set "admin_hash="
 for /f "tokens=2 delims==" %%s in ('findstr /i /c:"SYSTEM ADMINISTRATOR =" "%kernel_path%" 2^>nul') do set "admin_hash=%%s"
@@ -862,11 +1200,14 @@ echo [ ERROR ] Access denied. & goto cmd_loop
 if "%enable_lua%"=="0 " goto core
 
 set "is_ok=0"
-for %%a in (Help mkdir cp mv touch backup ls cd cat ren backup-restore passwd reboot_to_recovery lock ArsStore NoteLite Snake sysinfo Scanner fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
+for %%a in (Help mkdir ping cp mv touch backup ls cd cat ren backup-restore passwd reboot_to_recovery lock ArsStore NoteLite Snake sysinfo Scanner fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad miner.game reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
 
 if "%is_ok%"=="0" (
     if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" goto core
     if /i "%current_user%"=="SYSTEM ADMINISTRATOR" goto core
+    if /i "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" goto core
+    if /i "%current_user%"=="BarOS AUTHORITY\SysPulse" goto core
+    if /i "%current_user%"=="BarOS AUTHORITY\NetMonitor" goto core
     echo Error: Access Denied. Use "sudo %cmd%".
     goto cmd_loop
 )
@@ -880,26 +1221,73 @@ if /i "%current_user%"=="GUEST" (
     if "!ok!"=="0" echo [ SECURITY ] Guest cannot use this command. & goto cmd_loop
 )
 
-if /i "%rec%"=="1" (
+if /i "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" (
     set "ok=0"
-    for %%a in (Help mv cp rm touch chattr mkdir ls cd cat ren support reset reboot_to_recovery cls ver dir whoami events sfc adduser deluser regedit) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help mv bcdboot cp rm touch edit bcdedit mkdir ls cd cat ren support reset reboot_to_recovery cls ver dir whoami events sfc adduser deluser regedit) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    if "!ok!"=="0" echo [ SECURITY ] Restricred. & goto cmd_loop
+)
+
+if /i "%current_user%"=="BarOS AUTHORITY\SysPulse" (
+    set "ok=0"
+    for %%a in (Help ls sysinfo events report dash taskmgr cd cat support reboot shutdown reboot_to_recovery cls ver dir whoami) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    if "!ok!"=="0" echo [ SECURITY ] Restricred. & goto cmd_loop
+)
+
+if /i "%current_user%"=="BarOS AUTHORITY\NetMonitor" (
+    set "ok=0"
+    for %%a in (Help reboot ping netstat ipconfig tracert nslookup arp route shutdown cls whoami) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Restricred. & goto cmd_loop
 )
 
 if /i "%safe_mode%"=="1" (
     set "ok=0"
-    for %%a in (Help lock mv cp rm touch chattr mkdir ls cd cat ren backup backup-restore sysinfo support reset reboot_to_recovery report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help lock mv cp bcdboot bcdedit rm touch chattr mkdir ls cd cat ren backup backup-restore sysinfo support reset reboot_to_recovery report cls ver dir whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Safe mode. & goto cmd_loop
 )
 
 if "%enable_lua%"=="0 " goto exec
 if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" goto exec
 set "ok=0"
-for %%a in (Help calc notepad sysinfo cp mv rm reset bsod touch mkdir ls cd cat ren backup backup-restore lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
+for %%a in (Help calc ping bcdedit bcdboot loader_error netstat ipconfig tracert nslookup arp route notepad sysinfo cp mv rm reset bsod touch mkdir ls cd cat ren backup backup-restore lock support events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot dir adduser whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
 
 :exec
 :: --- NEW COMMANDS V26 ---
+
+if /i "%ex_c%"=="bcdedit" goto bcdedit 
+if /i "%ex_c%"=="bcdboot" goto bcdboot 
+if /i "%ex_c%"=="loader_error" (
+    cls
+    color 0f
+    echo ======================================================================================================================
+    echo                                                 ARSLANIUS BOOT MANAGER
+    echo ======================================================================================================================
+    echo.
+    echo ARSLANIUS failed to start. A recent hardware or software change might be
+    echo the cause.
+    echo.
+    echo Status: 0xc00000666
+    echo Status: 0xTeam_by_%current_user%
+    echo Status: 0xcDEADBEEF
+    echo Info: MANUAL_CRASH
+    echo.
+    echo File: \ARSLANIUS 26.cmd
+    echo.
+    echo Press [R] to Repair
+    echo Press [Enter] to Exit
+    echo.
+    echo ======================================================================================================================
+    set /p "choice=> "
+    if /i "!choice!"=="R" set "bsod=666" & goto bsod
+    exit
+)
+if /i "%ex_c%"=="ping" goto ping
+if /i "%ex_c%"=="netstat" goto netstat
+if /i "%ex_c%"=="ipconfig" goto ipconfig
+if /i "%ex_c%"=="tracert" goto tracert
+if /i "%ex_c%"=="nslookup" goto nslookup
+if /i "%ex_c%"=="arp" goto arp
+if /i "%ex_c%"=="route" goto route
 
 :: --- STANDART COMMANDS ---
 if /i "%ex_c%"=="ls" goto ls
@@ -918,7 +1306,7 @@ if /i "%ex_c%"=="backup-restore" goto backup_restore
 if /i "%ex_c%"=="sysinfo" goto sysinfo
 if /i "%ex_c%"=="reboot_to_recovery" (
     color 0f
-    timeout /t 1 >nul
+    timeout /t 2 >nul
     cls 
     echo .
     timeout /t 1 >nul
@@ -1032,6 +1420,55 @@ echo [ OK ] System backup created in Backup folder.
 pause
 goto cmd_loop
 
+:ping
+set /p "ping_host=Enter host to ping: "
+ping -n 4 %ping_host%
+pause
+goto cmd_loop
+
+:netstat
+netstat -an
+pause
+goto cmd_loop
+
+:ipconfig
+ipconfig /all
+pause
+goto cmd_loop
+
+:tracert
+set /p "trace_host=Enter host to trace: "
+tracert %trace_host%
+pause
+goto cmd_loop
+
+:bcdboot
+echo [ WAIT ] Creating default BCD configuration...
+echo BOOT_TIMEOUT=30 > "%root_path%\Settings And System Files\BCD"
+echo DEFAULT_MODE=1 >> "%root_path%\Settings And System Files\BCD"
+echo LAST_SUCCESSFUL_MODE=1 >> "%root_path%\Settings And System Files\BCD"
+echo BOOT_COUNT=0 >> "%root_path%\Settings And System Files\BCD"
+echo LAST_BOOT_SUCCESS=Never >> "%root_path%\Settings And System Files\BCD"
+echo [ OK ] BCD created. Reboot to apply changes.
+pause
+goto cmd_loop
+
+:nslookup
+set /p "ns_host=Enter host to lookup: "
+nslookup %ns_host%
+pause
+goto cmd_loop
+
+:arp
+arp -a
+pause
+goto cmd_loop
+
+:route
+route print
+pause
+goto cmd_loop
+
 :shutdown_screen
 cls
 color 9f
@@ -1065,8 +1502,9 @@ echo.
 echo.
 echo                                               %os_name%
 timeout /t 3 >nul
-del /f /q "%sys_services%\SysPulse.active" 2>nul
-del /f /q "%sys_services%\SFC_Daemon.active" 2>nul
+del /f /q "%sys_services%\SysPulse.active"
+del /f /q "%sys_services%\SFC_Daemon.active"
+del /f /q "%sys_services%\NetMonitor.active"
 exit
 
 :reboot_screen
@@ -1102,8 +1540,9 @@ echo.
 echo.
 echo                                               %os_name%
 timeout /t 3 >nul
-del /f /q "%sys_services%\SysPulse.active" 2>nul
-del /f /q "%sys_services%\SFC_Daemon.active" 2>nul
+del /f /q "%sys_services%\SysPulse.active"
+del /f /q "%sys_services%\SFC_Daemon.active"
+del /f /q "%sys_services%\NetMonitor.active"
 goto boot
 
 :dash
@@ -1121,6 +1560,7 @@ echo.
 echo [ SERVICES ]
 if exist "%sys_services%\SysPulse.active" (echo  - BarOS AUTHORITY\SysPulse: ONLINE) else (echo  - BarOS AUTHORITY\SysPulse: OFFLINE)
 if exist "%sys_services%\SFC_Daemon.active" (echo  - BarOS AUTHORITY\SFC_Daemon: ONLINE) else (echo  - BarOS AUTHORITY\SFC_Daemon: OFFLINE)
+if exist "%sys_services%\NetMonitor.active" (echo  - BarOS AUTHORITY\NetMonitor: ONLINE) else (echo  - BarOS AUTHORITY\NetMonitor: OFFLINE)
 
 echo.
 echo [ ENV ]
@@ -1192,7 +1632,8 @@ goto cmd_loop
 set "lsize=0"
 if exist "%log_path%" for %%i in ("%log_path%") do set "lsize=%%~zi"
 echo [ WAIT ] Generating HTML Report...
-set "report_f=%user_home%\Report_v26.html"
+echo. > "%root_path%\Report_v26.html"
+set "report_f=%root_path%\Report_v26.html"
 echo ^<html^>^<body style='background:#111;color:#0f0;font-family:monospace'^> > "%report_f%"
 echo ^<h1^>ARSLANIUS 26 - SYSTEM REPORT^</h1^> >> "%report_f%"
 echo ^<hr^>^<p^>Build: %current_build%^</p^> >> "%report_f%"
@@ -1209,6 +1650,9 @@ pause & goto cmd_loop
 :passwd
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" echo Cannot change SYSTEM password. & pause & goto cmd_loop
 if /i "%current_user%"=="SYSTEM ADMINISTRATOR" echo Cannot change ADMIN password. & pause & goto cmd_loop
+if /i "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" echo Cannot change TEMPORARY password. & pause & goto cmd_loop
+if /i "%current_user%"=="BarOS AUTHORITY\SysPulse" echo Cannot change TEMPORARY password. & pause & goto cmd_loop
+if /i "%current_user%"=="BarOS AUTHORITY\NetMonitor" echo Cannot change TEMPORARY password. & pause & goto cmd_loop
 
 set "old_hash="
 for /f "tokens=2 delims==" %%a in ('findstr /i /b "%current_user% =" "%kernel_path%"') do set "old_hash=%%a"
@@ -1283,13 +1727,16 @@ echo [ACCOUNTS]
 echo   Registered    : %ucount%
 echo.
 
+set "netm=OFFLINE"
 set "sp=OFFLINE"
 set "sfc=OFFLINE"
 if exist "%sys_services%\SysPulse.active" set "sp=ONLINE"
 if exist "%sys_services%\SFC_Daemon.active" set "sfc=ONLINE"
+if exist "%sys_services%\NetMonitor.active" set "netm=ONLINE"
 echo [SERVICES]
 echo   BarOS AUTHORITY\SysPulse      : %sp%
 echo   BarOS AUTHORITY\SFC_Daemon    : %sfc%
+echo   BarOS AUTHORITY\NetMonitor    : %netm%
 echo.
 
 set "ksize=0"
@@ -1374,8 +1821,38 @@ if /i "!conf!"=="YES" goto startup_repair
 echo Canceled.
 goto cmd_loop
 
+:bcdedit
+if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" if /i NOT "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" (
+    echo [ SECURITY ] Access Denied. Only for Admins.
+    goto cmd_loop
+)
+echo.
+echo -- BOOT CONFIGURATION EDITOR --
+set /p "boot_timeout_new=Enter new timeout (or Enter to skip): "
+if NOT "%boot_timeout_new%"=="" (
+    echo BOOT_TIMEOUT=%boot_timeout_new% > "%root_path%\Settings And System Files\BCD"
+    echo [ OK ] timeout updated.
+)
+if "%boot_timeout_new%"=="" (
+    echo BOOT_TIMEOUT=30 > "%root_path%\Settings And System Files\BCD"
+)
+
+set /p "Default_choice_new=Enter Default Mode (ex: 1): "
+if NOT "%Default_choice_new%"=="" echo DEFAULT_MODE=%Default_choice_new% >> "%root_path%\Settings And System Files\BCD"
+if "%Default_choice_new%"=="" (
+    echo DEFAULT_MODE=1 >> "%root_path%\Settings And System Files\BCD"
+)
+
+echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%root_path%\Settings And System Files\BCD"
+echo BOOT_COUNT=%boot_count% >> "%root_path%\Settings And System Files\BCD"
+echo LAST_BOOT_SUCCESS=%date% >> "%root_path%\Settings And System Files\BCD"
+
+echo [ DONE ] Configuration saved. Reboot to apply changes.
+pause
+goto cmd_loop
+
 :regedit
-if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" (
+if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" if /i NOT "%current_user%"=="BarOS AUTHORITY\SYSTEM" if /i NOT "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" (
     echo [ SECURITY ] Access Denied. Only for Admins.
     goto cmd_loop
 )
@@ -1625,6 +2102,9 @@ goto fmx
 echo Current User: %current_user%
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" echo Permissions: KERNEL
 if /i "%current_user%"=="SYSTEM ADMINISTRATOR" echo Permissions: Administrator
+if /i "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" echo Permissions: LOCAL SERVICE
+if /i "%current_user%"=="BarOS AUTHORITY\SysPulse" echo Permissions: LOCAL SERVICE
+if /i "%current_user%"=="BarOS AUTHORITY\NetMonitor" echo Permissions: NETWORK SERVICE
 echo Path: %cd%
 goto cmd_loop
 
@@ -1661,12 +2141,10 @@ goto cmd_loop
 echo [ WAIT ] Repairing system files...
 if not exist "%root_path%\Settings And System Files" md "%root_path%\Settings And System Files" 2>nul
 if NOT exist "%kernel_path%" (
-    call :hash "Acy98iolop_isArslanius-kop"
-echo SYSTEM = !errorlevel! >> "%kernel_path%"
-    call :hash "Jiupolaqmn_isArslanius-lo"
-echo SYSTEM ADMINISTRATOR = !errorlevel! >> "%kernel_path%"
+    echo SYSTEM = -414170332 > "%kernel_path%"
+    echo SYSTEM ADMINISTRATOR = 156593571 >> "%kernel_path%"
 )
-echo OS_NAME = %os_name% > "%reg_path%"
+echo OS_NAME =%os_name% > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
 echo ADMIN_COLOR=4f >> "%reg_path%"
 echo USER_COLOR=1f >> "%reg_path%"
@@ -1708,11 +2186,12 @@ goto cmd_loop
 
 :help
 echo Apps: Notepad, Calc (Must be installed from ArsStore), taskmgr, edit, install, regedit, ArsStore, as-pack, as-unpack, sysinfo
-echo System: Help, Lock, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch, cp, mv
-echo Admin: adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod, rm
+echo System: Help, Lock, ping, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch, cp, mv
+echo Admin: adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod, rm, netstat, ipconfig, tracert, nslookup, arp, route, loader_error, bcdboot, bcdedit
 goto cmd_loop
 
 :restore_point
+if "rp_limit"=="1" echo RestorePoints Overflow & goto cmd_loop
 if not exist "%restore_root%" md "%restore_root%" 2>nul
 
 set "rp_name=RP_%date:~6,4%%date:~3,2%%date:~0,2%_%time:~0,2%%time:~3,2%%time:~6,2%"
@@ -1881,6 +2360,27 @@ pause
 goto boot
 
 :bsod
+if /i "%bsod%"=="1a" (
+   cls
+   color 17
+   echo *** STOP: 0x00000001a [0xc00000001a, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files
+   echo.
+   echo CONFIG_ROOT_NOT_FOUND - The config root is missing.
+   echo Please reinstall or run Startup Repair.
+   echo.
+   echo If this is the first time you've seen this error, restart the system.
+   echo If it appears again, run Startup Repair from the recovery environment.
+   echo.
+   echo Technical information:
+   echo *** Address 0x00000001a base at Settings And System Files - CONFIG_ROOT_NOT_FOUND
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+
 if /i "%bsod%"=="1" (
    cls
    color 17
@@ -2091,12 +2591,52 @@ if /i "%bsod%"=="10" (
    goto repair
 )
 
+if /i "%bsod%"=="11" (
+   cls
+   color 17
+   echo *** STOP: 0x00000011 [0xc00000011, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \Settings And System Files\REG.cfg
+   echo.
+   echo The registry is full, run startup repair to reset it.
+   echo Looks like someone filled the registry with all sorts of junk, huh?
+   echo Run Startup Repair to restore registry.
+   echo.
+   echo Technical information:
+   echo *** Size: %registrysize% bytes
+   echo *** REG file found but locked.
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto repair
+)
+
+if /i "%bsod%"=="12" (
+    cls
+    color 17
+    echo *** STOP: 0x00000012 [0xc00000012, 0x00000000, 0x00000000, 0x00000000]
+    echo.
+    echo *** File: \Settings And System Files\system.log
+    echo.
+    echo LOG_OVERFLOW - The system log is full of shit.
+    echo Someone's been writing a novel in system.log.
+    echo 150 KB is the limit. Run Startup Repair to clear the log.
+    echo.
+    echo Technical information:
+    echo *** Size: %logsize% bytes
+    echo *** Log file found but locked due to size limit.
+    echo.
+    echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+    pause
+    goto repair
+)
+
 if /i "%bsod%"=="666" (
    cls
    color 17
    echo *** STOP: 0xDEADBEEF [0x00000666, 0x00000000, 0x00000000, 0x00000000]
    echo.
-   echo MANUAL_CRASH - You typed 'bsod' and now you're here. Surprised? You shouldn't be.
+   echo MANUAL_CRASH - You typed 'bsod' or 'loader_error' and now you're here. Surprised? You shouldn't be.
    echo This error was intentionally triggered by the 'bsod' command.
    echo No real damage was done. Just reboot and continue.
    echo.
