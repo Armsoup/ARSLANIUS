@@ -1,4 +1,4 @@
-﻿
+
 @echo off
 setlocal enabledelayedexpansion
 title ARSLANIUS 26
@@ -9,14 +9,15 @@ set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
 set "current_build=56.2"
-set "kernel_path=%root_path%\Settings And System Files\kernel.dll"
+set "config_root=%root_path%\Settings And System Files"
+set "kernel_path=%config_root%\kernel.dll"
 set "users_root=%root_path%\Users"
 set "reg_version=26"
 set "programs_root=%root_path%\Programs"
-set "sys_prof=%root_path%\Settings And System Files\systemprofile"
-set "sys_services=%root_path%\Settings And System Files\systemprofile"
-set "reg_path=%root_path%\Settings And System Files\REG.cfg"
-set "log_path=%root_path%\Settings And System Files\system.log"
+set "sys_prof=%config_root%\systemprofile"
+set "sys_services=%config_root%\systemprofile"
+set "reg_path=%config_root%\REG.cfg"
+set "log_path=%config_root%\system.log"
 set "restore_root=%root_path%\RestorePoints"
 if exist "%root_path%\Setting And System Files" (
     if not exist "%root_path%\Settings And System Files" (
@@ -77,10 +78,10 @@ if "%boot_choice%"=="2" (
         echo ======================================================================================================================
         echo                                                 ARSLANIUS BOOT MANAGER
         echo ======================================================================================================================
-        if NOT exist %root_path%\Settings And System Files" 2>nul (
+        if NOT exist "%config_root%" 2>nul (
             echo ...
         )
-        if exist "%root_path%\Settings And System Files\BCD" 2>nul (
+        if exist "%config_root%\BCD" 2>nul (
             echo Loaded: \Settings And System Files\BCD
         )
         if exist "%kernel_path%" 2>nul (
@@ -172,7 +173,7 @@ if "%boot_choice%"=="5" (
     goto interface
 )
 
-if NOT exist "%root_path%\Settings And System Files" (
+if NOT exist "%config_root%" (
     cls
     color 0f
     echo ======================================================================================================================
@@ -196,7 +197,7 @@ if NOT exist "%root_path%\Settings And System Files" (
     exit
 )
 
-if not exist "%root_path%\Settings And System Files\BCD" (
+if not exist "%config_root%\BCD" (
     cls
     color 0f
     echo ======================================================================================================================
@@ -353,7 +354,7 @@ goto repair
 :startup_repair
 echo.
 echo [ WAIT ] Running Startup Repair...
-if not exist "%root_path%\Settings And System Files" md "%root_path%\Settings And System Files"
+if not exist "%config_root%" md "%config_root%"
 if not exist "%sys_services%" md "%sys_services%" 2>nul
 
 echo SYSTEM = -414170332 > "%kernel_path%"
@@ -381,11 +382,11 @@ timeout /t 1 >nul
 
 if exist "%sys_services%\*.cnt" del /f /q "%sys_services%\*.cnt"
 
-echo BOOT_TIMEOUT=30 > "%root_path%\Settings And System Files\BCD"
-echo DEFAULT_MODE=1 >> "%root_path%\Settings And System Files\BCD"
-echo LAST_SUCCESSFUL_MODE=1 >> "%root_path%\Settings And System Files\BCD"
-echo BOOT_COUNT=0 >> "%root_path%\Settings And System Files\BCD"
-echo LAST_BOOT_SUCCESS=%date% >> "%root_path%\Settings And System Files\BCD"
+echo BOOT_TIMEOUT=30 > "%config_root%\BCD"
+echo DEFAULT_MODE=1 >> "%config_root%\BCD"
+echo LAST_SUCCESSFUL_MODE=1 >> "%config_root%\BCD"
+echo BOOT_COUNT=0 >> "%config_root%\BCD"
+echo LAST_BOOT_SUCCESS=%date% >> "%config_root%\BCD"
 
 echo OS_NAME = ARSLANIUS 26 > "%reg_path%"
 echo SYSTEM_COLOR=0e >> "%reg_path%"
@@ -401,7 +402,7 @@ pause
 goto repair
 
 :restore_menu
-if not exist "%root_path%\Settings And System Files" md "%root_path%\Settings And System Files"
+if not exist "%config_root%" md "%config_root%"
 if not exist "%restore_root%" (
     echo [ ERROR ] No restore points directory.
     pause & goto repair 
@@ -937,17 +938,6 @@ echo %hash_val%
 exit /b %hash_val%
 
 :logon_screen
-set "current_mode=%boot_choice%"
-if "%rec%"=="1" set "current_mode=3"
-if "%diagnostic%"=="1" set "current_mode=4"
-if "%diagnostic%"=="2" set "current_mode=5"
-
-echo BOOT_TIMEOUT=%boot_timeout% > "%root_path%\Settings And System Files\BCD"
-echo DEFAULT_MODE=%default_mode% >> "%root_path%\Settings And System Files\BCD"
-echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%root_path%\Settings And System Files\BCD"
-echo BOOT_COUNT=%boot_count% >> "%root_path%\Settings And System Files\BCD"
-echo LAST_BOOT_SUCCESS=%date% >> "%root_path%\Settings And System Files\BCD"
-
 set "u_in=" & set "p_in="
 set "current_user=SYSTEM"
 set "user_home=%sys_prof%"
@@ -1012,6 +1002,17 @@ for /f "tokens=2 delims==" %%c in ('findstr /i "%reg_key%" "%reg_path%"') do col
 cd /d "%user_home%" 2>nul
 
 :interface
+set "current_mode=%boot_choice%"
+if "%rec%"=="1" set "current_mode=3"
+if "%diagnostic%"=="1" set "current_mode=4"
+if "%diagnostic%"=="2" set "current_mode=5"
+
+echo BOOT_TIMEOUT=%boot_timeout% > "%config_root%\BCD"
+echo DEFAULT_MODE=%default_mode% >> "%config_root%\BCD"
+echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%config_root%\BCD"
+echo BOOT_COUNT=%boot_count% >> "%config_root%\BCD"
+echo LAST_BOOT_SUCCESS=%date% >> "%config_root%\BCD"
+
 if "%rec%"=="1" set "current_user=BarOS AUTHORITY\SYSTEM"
 if "%safe_mode%"=="0" if "%rec%"=="0" if "%diagnostic%"=="0" (
     if not exist "%sys_services%\SysPulse.active" (
@@ -1444,11 +1445,11 @@ goto cmd_loop
 
 :bcdboot
 echo [ WAIT ] Creating default BCD configuration...
-echo BOOT_TIMEOUT=30 > "%root_path%\Settings And System Files\BCD"
-echo DEFAULT_MODE=1 >> "%root_path%\Settings And System Files\BCD"
-echo LAST_SUCCESSFUL_MODE=1 >> "%root_path%\Settings And System Files\BCD"
-echo BOOT_COUNT=0 >> "%root_path%\Settings And System Files\BCD"
-echo LAST_BOOT_SUCCESS=Never >> "%root_path%\Settings And System Files\BCD"
+echo BOOT_TIMEOUT=30 > "%config_root%\BCD"
+echo DEFAULT_MODE=1 >> "%config_root%\BCD"
+echo LAST_SUCCESSFUL_MODE=1 >> "%config_root%\BCD"
+echo BOOT_COUNT=0 >> "%config_root%\BCD"
+echo LAST_BOOT_SUCCESS=Never >> "%config_root%\BCD"
 echo [ OK ] BCD created. Reboot to apply changes.
 pause
 goto cmd_loop
@@ -1830,22 +1831,22 @@ echo.
 echo -- BOOT CONFIGURATION EDITOR --
 set /p "boot_timeout_new=Enter new timeout (or Enter to skip): "
 if NOT "%boot_timeout_new%"=="" (
-    echo BOOT_TIMEOUT=%boot_timeout_new% > "%root_path%\Settings And System Files\BCD"
+    echo BOOT_TIMEOUT=%boot_timeout_new% > "%config_root%\BCD"
     echo [ OK ] timeout updated.
 )
 if "%boot_timeout_new%"=="" (
-    echo BOOT_TIMEOUT=30 > "%root_path%\Settings And System Files\BCD"
+    echo BOOT_TIMEOUT=30 > "%config_root%\BCD"
 )
 
 set /p "Default_choice_new=Enter Default Mode (ex: 1): "
-if NOT "%Default_choice_new%"=="" echo DEFAULT_MODE=%Default_choice_new% >> "%root_path%\Settings And System Files\BCD"
+if NOT "%Default_choice_new%"=="" echo DEFAULT_MODE=%Default_choice_new% >> "%config_root%\BCD"
 if "%Default_choice_new%"=="" (
-    echo DEFAULT_MODE=1 >> "%root_path%\Settings And System Files\BCD"
+    echo DEFAULT_MODE=1 >> "%config_root%\BCD"
 )
 
-echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%root_path%\Settings And System Files\BCD"
-echo BOOT_COUNT=%boot_count% >> "%root_path%\Settings And System Files\BCD"
-echo LAST_BOOT_SUCCESS=%date% >> "%root_path%\Settings And System Files\BCD"
+echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%config_root%\BCD"
+echo BOOT_COUNT=%boot_count% >> "%config_root%\BCD"
+echo LAST_BOOT_SUCCESS=%date% >> "%config_root%\BCD"
 
 echo [ DONE ] Configuration saved. Reboot to apply changes.
 pause
@@ -2114,6 +2115,9 @@ echo [ SYSTEM ] Beginning system file check...
 timeout /t 1 >nul
 set "errors=0"
 
+echo [ WAIT ] Checking: BCD...
+if NOT exist "%config_root%\BCD" (set "errors=1" & echo [ FAIL ] BCD MISSING) else (echo [  OK  ] BCD)
+
 echo [ WAIT ] Checking: kernel.dll...
 if NOT exist "%kernel_path%" (set "errors=1" & echo [ FAIL ] kernel.dll MISSING) else (
     for %%i in ("%kernel_path%") do if %%~zi LSS 10 (set "errors=1" & echo [ FAIL ] kernel.dll CORRUPTED) else (echo [  OK  ] kernel.dll)
@@ -2139,7 +2143,7 @@ goto cmd_loop
 
 :sfc_repair
 echo [ WAIT ] Repairing system files...
-if not exist "%root_path%\Settings And System Files" md "%root_path%\Settings And System Files" 2>nul
+if not exist "%config_root%" md "%config_root%" 2>nul
 if NOT exist "%kernel_path%" (
     echo SYSTEM = -414170332 > "%kernel_path%"
     echo SYSTEM ADMINISTRATOR = 156593571 >> "%kernel_path%"
@@ -2150,6 +2154,12 @@ echo ADMIN_COLOR=4f >> "%reg_path%"
 echo USER_COLOR=1f >> "%reg_path%"
 echo ENABLE_LUA=1 >> "%reg_path%"
 echo REG_VERSION=%reg_version% >> "%reg_path%"
+
+echo BOOT_TIMEOUT=30 > "%config_root%\BCD"
+echo DEFAULT_MODE=1 >> "%config_root%\BCD"
+echo LAST_SUCCESSFUL_MODE=1 >> "%config_root%\BCD"
+echo BOOT_COUNT=0 >> "%config_root%\BCD"
+echo LAST_BOOT_SUCCESS=Never >> "%config_root%\BCD"
 
 echo [%date% %time% WARNING] SFC_SILENT_REPAIR_SUCCESS >> "%log_path%"
 echo [ DONE ] Repair complete. Returning to terminal.
@@ -2191,8 +2201,8 @@ echo Admin: adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, c
 goto cmd_loop
 
 :restore_point
-if "rp_limit"=="1" echo RestorePoints Overflow & goto cmd_loop
-if not exist "%restore_root%" md "%restore_root%" 2>nul
+if NOT exist "%config_root%" md "%config_root%" 2>nul
+if NOT exist "%restore_root%" md "%restore_root%" 2>nul
 
 set "rp_name=RP_%date:~6,4%%date:~3,2%%date:~0,2%_%time:~0,2%%time:~3,2%%time:~6,2%"
 set "rp_name=%rp_name: =0%"
@@ -2320,7 +2330,7 @@ echo                                         1. Explorer (FMX)    4. Regedit (RE
 echo                                         2. Reboot            5. Control (DASH)
 echo                                         3. ArsStore          0. Exit Menu
 echo ----------------------------------------------------------------------------------------------------------------------
-echo                                         [ Recent Apps: miner.game, notepad ]
+echo                                         [ Recent Apps: ArsStore, notepad ]
 echo ----------------------------------------------------------------------------------------------------------------------
 set /p "win_c=Search or Select: "
 
