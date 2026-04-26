@@ -18,7 +18,7 @@ Features
 
 • Access control and privilege elevation
 
-• Background services (SysPulse, SFC_Daemon)
+• Background services (SysPulse, SFC_Daemon, NetMonitor)
 
 • Recovery Environment
 
