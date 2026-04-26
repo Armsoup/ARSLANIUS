@@ -12,7 +12,7 @@ The system can run directly from a USB drive and automatically initializes itsel
 
 Features
 
-• Boot menu with Safe Mode
+• Boot menu with Safe Mode, Diagnostic Mode and manual
 
 • User accounts: SYSTEM, SYSTEM ADMINISTRATOR, GUEST
 
@@ -41,7 +41,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 26.cmd
+  ├─ ARSLANIUS 27.cmd
 
   ├─ Backup/
   
@@ -90,6 +90,8 @@ Included Versions
 • ARSLANIUS 25 - Added cd, ls, cp, rm, mv, cat, ren, touch, mkdir, and chattr commands, shutdown and reboot screens, BSoD and hash have been updated, and ARSLANIUS BOOT MANAGER has been added, fixed security bugs, and made the old version of the registry incompatible with the new one.
 
 • ARSLANIUS 26 - Added new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
+
+• ARSLANIUS 27 - Added autorun command, manual and fixed bugs.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
@@ -109,14 +111,14 @@ Unsupported versions:
 
 · ARSLANIUS 23
 
-  These versions are no longer maintained. Please use the latest release (ARSLANIUS 26) for an up-to-date and secure experience.
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 27) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
   
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 26.cmd.
+2. Launch ARSLANIUS 27.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR / Jiupolaqmn_isArslanius-lo
 5. Create a user account.
