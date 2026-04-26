@@ -64,15 +64,35 @@ set "boot_choice=%errorlevel%"
 if "%boot_choice%"=="6" goto manual
 
 if "%boot_choice%"=="1" (
-    cls
-    echo ======================================================================================================================
-    echo                                                 ARSLANIUS BOOT MANAGER
-    echo ======================================================================================================================
-    echo                                                 Loading ARSLANIUS 27
-    echo         Build: %current_build%
-    echo         Kernel: BarOS 23.0
-    echo ======================================================================================================================
-    timeout /t 2 >nul
+    for /l %%i in (1,1,15) do (
+        cls
+        echo ======================================================================================================================
+        echo                                                 ARSLANIUS BOOT MANAGER
+        echo ======================================================================================================================
+        echo                                                 Loading ARSLANIUS 27
+        echo.
+        echo         Build: %current_build%
+        echo         Kernel: BarOS 23.0
+        echo.
+        echo                                                  _____________
+        if %%i==1  echo                                                 ^|.            ^|
+        if %%i==2  echo                                                 ^|..           ^|
+        if %%i==3  echo                                                 ^|...          ^|
+        if %%i==4  echo                                                 ^| ...         ^|
+        if %%i==5  echo                                                 ^|  ...        ^|
+        if %%i==6  echo                                                 ^|   ...       ^|
+        if %%i==7  echo                                                 ^|    ...      ^|
+        if %%i==8  echo                                                 ^|     ...     ^|
+        if %%i==9  echo                                                 ^|      ...    ^|
+        if %%i==10 echo                                                 ^|       ...   ^|
+        if %%i==11 echo                                                 ^|        ...  ^|
+        if %%i==12 echo                                                 ^|         ... ^|
+        if %%i==13 echo                                                 ^|          ...^|
+        if %%i==14 echo                                                 ^|           ..^|
+        if %%i==15 echo                                                 ^|            .^|
+        echo                                                  --------------
+        pathping 127.0.0.1 -n -q 1 -p 300 >nul
+    )
 )
 
 if "%boot_choice%"=="2" (
