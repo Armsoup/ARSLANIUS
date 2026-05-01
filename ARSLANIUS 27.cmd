@@ -1,21 +1,21 @@
 
 @echo off
 setlocal enabledelayedexpansion
-title ARSLANIUS 27 RC
+title ARSLANIUS 27
 
 :boot
 color 0f
 set "root_path=%~dp0"
 if "%root_path:~-1%"=="\" set "root_path=%root_path:~0,-1%"
 
-set "current_build=57.1"
+set "current_build=57.2"
 set "config_root=%root_path%\Settings And System Files"
 set "kernel_path=%config_root%\kernel.dll"
 set "users_root=%root_path%\Users"
 set "reg_version=27"
 set "programs_root=%root_path%\Programs"
 set "sys_prof=%config_root%\systemprofile"
-set "sys_services=%config_root%\systemprofile"
+set "sys_services=%sys_prof%"
 set "reg_path=%config_root%\REG.cfg"
 set "log_path=%config_root%\system.log"
 set "restore_root=%root_path%\RestorePoints"
@@ -31,9 +31,15 @@ set "boot_choice="
 set "safe_mode=0"
 set "rec=0"
 set "diagnostic=0"
-set "last_successful_mode=1"
+set "logon_success_ok=0"
+set "last_successful_mode=0"
+set "resume=0"
+set "initctrl=0"
+set "wait_mode=0"
+set "logout_request=0"
+set "acpi_request=0"
 
-if exist "%root_path%\Settings And System Files\BCD" (
+if exist "%config_root%\BCD" (
     for /f "tokens=1,* delims==" %%a in ('type "%root_path%\Settings And System Files\BCD" 2^>nul') do (
         if "%%a"=="BOOT_TIMEOUT" set "boot_timeout=%%b"
         if "%%a"=="DEFAULT_MODE" set "default_mode=%%b"
@@ -45,7 +51,7 @@ cls
 echo ======================================================================================================================
 echo                                                 ARSLANIUS BOOT MANAGER 
 echo ======================================================================================================================
-if %last_successful_mode% NEQ 0 (
+if "%last_successful_mode%" NEQ 0 (
     echo  Last Known Good Configuration [Mode %last_successful_mode%]
 )
 echo  1. Start ARSLANIUS Normally
@@ -90,7 +96,7 @@ if "%boot_choice%"=="1" (
         if %%i==13 echo                                                 ^|          ...^|
         if %%i==14 echo                                                 ^|           ..^|
         if %%i==15 echo                                                 ^|            .^|
-        echo                                                  --------------
+        echo                                                  -------------
         pathping 127.0.0.1 -n -q 1 -p 300 >nul
     )
 )
@@ -312,12 +318,12 @@ echo   - Press 1-5 to select mode
 echo   - Auto-boot in %boot_timeout% seconds
 echo.
 echo [ COMMANDS ]
-echo   System: help, lock, cls, ver, whoami, reboot, shutdown, autorun
+echo   System: help, lock, cls, ver, whoami, reboot, shutdown, autorun, lockmenu [ctrl alt del]
 echo   Files: ls, cd, cat, ren, mkdir, touch, edit, cp, mv, rm, chattr
 echo   Admin: adduser, deluser, passwd, regedit, bcdedit, bcdboot, reset
 echo   Network: ping, netstat, ipconfig, tracert, nslookup, arp, route
 echo   Recovery: backup, backup-restore, restore-point, restore, sfc, events
-echo   Fun: bsod, loader_error, ArsStore, Notepad, Calc
+echo   Fun: bsod, loader_error, ArsStore, Notepad, Calc, wait_mode
 echo.
 echo [ RECOVERY ENVIRONMENT ]
 echo   1 [Startup Repair] - recreates all files
@@ -361,7 +367,8 @@ echo  [5] Memory Diagnostic     - Check system memory
 echo  [6] Return to boot menu
 echo.
 echo ======================================================================================================================
-set /p "recovery_choice=Select option (1-6): "
+choice /C 123456 /N /M "Select option (1-6): "
+set "recovery_choice=%errorlevel%"
 
 if "%recovery_choice%"=="1" goto startup_repair
 if "%recovery_choice%"=="2" goto restore_menu
@@ -958,6 +965,7 @@ echo %hash_val%
 exit /b %hash_val%
 
 :logon_screen
+set "initctrl=0"
 set "u_in=" & set "p_in="
 set "current_user=SYSTEM"
 set "user_home=%sys_prof%"
@@ -978,10 +986,10 @@ echo ---------------------------------------------------------------------------
 echo.
 set /p "u_in=Username: "
 
-if /i "%u_in%"=="Shutdown" echo [%date% %time% INFO] SHUTDOWN_FROM_LOGON >> "%log_path%" & goto shutdown_screen
-if /i "%u_in%"=="Reboot" echo [%date% %time% INFO] REBOOT_FROM_LOGON >> "%log_path%" & goto reboot_screen
+if /i "%u_in%"=="Shutdown" echo [%date% %time% INFO] SHUTDOWN_FROM_LOGON >> "%log_path%" & set "initctrl=0" & set "logout_request=1" & set "acpi_request=1" & goto arslogon 
+if /i "%u_in%"=="Reboot" echo [%date% %time% INFO] REBOOT_FROM_LOGON >> "%log_path%" & set "initctrl=0" & set "logout_request=1" & set "acpi_request=2" & goto arslogon
 
-if "%u_in%"=="" goto logon_screen
+if "%u_in%"=="" set "logon_success_ok=0" & goto logon_screen
 
 set "login_attempts=0"
 if exist "%sys_services%\fail_%u_in%.cnt" (
@@ -993,31 +1001,112 @@ if !login_attempts! GEQ 10 set "bsod=9" & goto bsod
 
 set /p "p_in=Password: "
 
+:arslogon
+if "%initctrl%"=="1" (
+    set "init_ctrl_choice="
+    cls
+    echo.
+    echo.
+    echo.
+    echo                                                  1. Logout
+    echo                                                  2. Passwd
+    echo                                                  3. Shutdown 
+    echo                                                  4. Reboot
+    echo                                                  5. Help 
+    echo                                                  6. Return
+    echo.
+    echo.
+    choice /C 123456 /N /M "Select option (1-6): "
+    set "init_ctrl_choice=!errorlevel!"
+
+    if "!init_ctrl_choice!"=="1" (
+         set "initctrl=0" 
+         set "logout_request=1"
+         set "acpi_request=0"
+         goto arslogon 
+    )
+    if "!init_ctrl_choice!"=="2" (
+        cls 
+        set "initctrl=0" 
+        goto passwd 
+    )
+    if "!init_ctrl_choice!"=="3" ( 
+        set "initctrl=0" 
+        set "logout_request=1"
+        set "acpi_request=1"
+        goto arslogon 
+    )
+    if "!init_ctrl_choice!"=="4" ( 
+        set "initctrl=0" 
+        set "logout_request=1"
+        set "acpi_request=2"
+        goto arslogon 
+    )
+    if "!init_ctrl_choice!"=="5" ( 
+        cls
+        set "initctrl=0" 
+        goto help 
+    )
+    if "!init_ctrl_choice!"=="6" ( 
+        cls
+        set "initctrl=0" 
+        goto cmd_loop 
+    )
+)
+if "%logout_request%"=="1" (
+    cls
+    color 5b
+    echo. 
+    echo                                                      Logout...
+    echo.
+    timeout /t 2 >nul
+    if "%acpi_request%"=="1" goto shutdown_screen
+    if "%acpi_request%"=="2" goto reboot_screen
+    set "current_user=SYSTEM"
+    set "user_home=%sys_prof%"
+    set "logon_success_ok=0" 
+    set "logout_request=0"
+    set "wait_mode=0" 
+    set "initctrl=0"
+    goto logon_screen
+)
+if "%wait_mode%"=="1" (
+    cls
+    color 0f
+    echo.
+    echo.
+    echo                                                  %os_name%
+    echo.
+    echo.
+    pause
+    set "wait_mode=0" 
+    goto apply_color
+)
+if "%logon_success_ok%"=="1" cls & color 5b & echo. & echo. & echo                                                  Please Wait... & timeout /t 2 >nul & echo                             ERROR: Session active, terminating ArsLogon... & timeout /t 2 >nul & set "bsod=DIED" & goto bsod
+set "logon_success_ok=1"
 set "stored_hash="
 for /f "tokens=2 delims==" %%a in ('findstr /c:"%u_in% =" "%kernel_path%" 2^>nul') do set "stored_hash=%%a"
-if not defined stored_hash echo [ ERROR ] User not found. & pause & goto logon_screen
+if not defined stored_hash echo [ ERROR ] User not found. & set "logon_success_ok=0" & pause & goto logon_screen
 set "stored_hash=%stored_hash: =%"
 call :hash "%p_in%"
-if "!errorlevel!"=="%stored_hash%" goto logon_ok
+if "!errorlevel!"=="%stored_hash%" (
+    if exist "%sys_services%\fail_!u_in!.cnt" del /f /q "%sys_services%\fail_!u_in!.cnt"
+
+    set "current_user=!u_in!"
+    if /i "!current_user!"=="SYSTEM" (set "user_home=%sys_prof%") else (set "user_home=%users_root%\!current_user!")
+    if /i "!current_user!"=="SYSTEM" set "current_user=BarOS AUTHORITY\SYSTEM"
+    if not exist "!user_home!" md "!user_home!" 2>nul
+    if /i "!current_user!"=="BarOS AUTHORITY\SYSTEM" set "reg_key=SYSTEM_COLOR" & goto apply_color
+    if /i "!current_user!"=="SYSTEM ADMINISTRATOR" set "reg_key=ADMIN_COLOR" & goto apply_color
+    set "reg_key=USER_COLOR" & goto apply_color
+)
 if NOT "!errorlevel!"=="%stored_hash%" (
     set /a login_attempts+=1
     echo !login_attempts!> "%sys_services%\fail_%u_in%.cnt"
     echo [ ERROR ] Password incorrect. (Attempt !login_attempts!/10)
     if !login_attempts! GEQ 10 set "bsod=9" & goto bsod
-    pause & goto logon_screen
+    pause & set "logon_success_ok=0" & goto logon_screen
 )
-
-:logon_ok
-if exist "%sys_services%\fail_%u_in%.cnt" del /f /q "%sys_services%\fail_%u_in%.cnt"
-
-set "current_user=%u_in%"
-if /i "%current_user%"=="SYSTEM" (set "user_home=%sys_prof%") else (set "user_home=%users_root%\%current_user%")
-
-if /i "%current_user%"=="SYSTEM" set "current_user=BarOS AUTHORITY\SYSTEM"
-if not exist "%user_home%" md "%user_home%" 2>nul
-if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" set "reg_key=SYSTEM_COLOR" & goto apply_color
-if /i "%current_user%"=="SYSTEM ADMINISTRATOR" set "reg_key=ADMIN_COLOR" & goto apply_color
-set "reg_key=USER_COLOR" & goto apply_color
 					
 :apply_color
 if exist "%sys_services%\fail_%u_in%.cnt" del /f /q "%sys_services%\fail_%u_in%.cnt" >nul
@@ -1030,11 +1119,11 @@ if "%rec%"=="1" set "current_mode=3"
 if "%diagnostic%"=="1" set "current_mode=4"
 if "%diagnostic%"=="2" set "current_mode=5"
 
-echo BOOT_TIMEOUT=%boot_timeout% > "%config_root%\BCD"
-echo DEFAULT_MODE=%default_mode% >> "%config_root%\BCD"
+echo BOOT_TIMEOUT=%boot_timeout%> "%config_root%\BCD"
+echo DEFAULT_MODE=%default_mode%>> "%config_root%\BCD"
 echo LAST_SUCCESSFUL_MODE=%current_mode% >> "%config_root%\BCD"
-echo BOOT_COUNT=%boot_count% >> "%config_root%\BCD"
-echo LAST_BOOT_SUCCESS=%date% >> "%config_root%\BCD"
+echo BOOT_COUNT=%boot_count%>> "%config_root%\BCD"
+echo LAST_BOOT_SUCCESS=%date%>> "%config_root%\BCD"
 
 if "%rec%"=="1" set "current_user=BarOS AUTHORITY\SYSTEM"
 if "%safe_mode%"=="0" if "%rec%"=="0" if "%diagnostic%"=="0" (
@@ -1137,6 +1226,11 @@ if exist "autorun.txt" (
 )
 
 :cmd_loop
+set "resume=0"
+set "initctrl=0"
+set "wait_mode=0"
+set "logout_request=0"
+set "acpi_request=0"
 if "%rec%"=="1" goto skip_all_services
 if "%safe_mode%"=="1" goto skip_all_services
 if "%diagnostic%"=="1" goto skip_all_services
@@ -1203,6 +1297,10 @@ set "cmd="
 set /p cmd="%current_user%@ARSLANIUS> "
 set "ex_c=%cmd%"
 if "%cmd%"=="" goto cmd_loop
+if /i "%cmd%"=="arslogon" (
+    if NOT "%current_user%"=="BarOS AUTHORITY\SFC_Daemon" if NOT "%current_user%"=="BarOS AUTHORITY\NetMonitor" if NOT "%current_user%"=="BarOS AUTHORITY\SysPulse" goto arslogon
+    goto cmd_loop
+)
 
 set "f_w=" & set "t_c="
 for /f "tokens=1,2" %%a in ("%cmd%") do (set "f_w=%%a" & set "t_c=%%b")
@@ -1229,7 +1327,7 @@ echo [ ERROR ] Access denied. & goto cmd_loop
 if "%enable_lua%"=="0 " goto core
 
 set "is_ok=0"
-for %%a in (Help mkdir autorun ping cp mv touch backup ls cd cat ren backup-restore passwd reboot_to_recovery lock ArsStore sysinfo fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
+for %%a in (Help mkdir hibernate wait_mode lockmenu autorun ping cp mv touch backup ls cd cat ren backup-restore passwd reboot_to_recovery lock ArsStore sysinfo fmx restore restore-point mail-send mail-read clean report cls ver whoami Calc Notepad reboot shutdown) do (if /i "%ex_c%"=="%%a" set "is_ok=1")
 
 if "%is_ok%"=="0" (
     if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" goto core
@@ -1246,7 +1344,7 @@ goto core
 :core_auto
 if /i "%current_user%"=="GUEST" (
     set "ok=0"
-    for %%a in (Help lock ls cd report cls ver whoami Calc Notepad reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help lock wait_mode hibernate ls cd lockmenu report cls ver whoami Calc Notepad reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Guest cannot use this command. & goto cmd_loop
 )
 
@@ -1270,19 +1368,21 @@ if /i "%current_user%"=="BarOS AUTHORITY\NetMonitor" (
 
 if /i "%safe_mode%"=="1" (
     set "ok=0"
-    for %%a in (Help lock mv cp bcdboot bcdedit rm touch chattr mkdir ls cd cat ren backup backup-restore sysinfo reset reboot_to_recovery report cls ver whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
+    for %%a in (Help lock wait_mode lockmenu mv cp bcdboot bcdedit rm touch chattr mkdir ls cd cat ren backup backup-restore sysinfo reset reboot_to_recovery report cls ver whoami events sfc dash fmx restore-point restore adduser deluser start regedit reboot shutdown) do (if /i "%ex_c%"=="%%a" set "ok=1")
     if "!ok!"=="0" echo [ SECURITY ] Safe mode. & goto cmd_loop
 )
 
 if "%enable_lua%"=="0 " goto exec
 if /i NOT "%current_user%"=="SYSTEM ADMINISTRATOR" goto exec
 set "ok=0"
-for %%a in (Help calc ping autorun bcdedit bcdboot loader_error netstat ipconfig tracert nslookup arp route notepad sysinfo cp mv rm reset bsod touch mkdir ls cd cat ren backup backup-restore lock events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot adduser start whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
+for %%a in (Help calc ping wait_mode lockmenu hibernate autorun bcdedit bcdboot loader_error netstat ipconfig tracert nslookup arp route notepad sysinfo cp mv rm reset bsod touch mkdir ls cd cat ren backup backup-restore lock events reboot_to_recovery report cls ver taskmgr fmx Shutdown Reboot adduser start whoami sfc clean mail-read mail-send edit guest msg-all regedit install deluser alert restore-point restore) do (if /i "%ex_c%"=="%%a" set "ok=1")
 if "%ok%"=="0" echo [ SECURITY ] Restricted context. & goto cmd_loop
 
 :exec
 :: --- NEW COMMANDS V27 ---
 if /i "%ex_c%"=="autorun" goto autorun
+if /i "%ex_c%"=="lockmenu" set "initctrl=1" & goto arslogon 
+if /i "%ex_c%"=="wait_mode" set "wait_mode=1" & goto arslogon 
 
 :: --- STANDART COMMANDS ---
 if /i "%ex_c%"=="bcdedit" goto bcdedit 
@@ -1399,13 +1499,28 @@ if /i "%ex_c%"=="mail-send" goto mail_send
 if /i "%ex_c%"=="mail-read" goto mail_read
 if /i "%ex_c%"=="clean" goto clean
 if /i "%ex_c%"=="edit" goto edit
-if /i "%ex_c%"=="lock" goto logon_screen
+if /i "%ex_c%"=="lock" (
+    set "initctrl=0" 
+    set "logout_request=1"
+    set "acpi_request=0"
+    goto arslogon 
+)
 if /i "%ex_c%"=="cls" goto interface
 if /i "%ex_c%"=="ver" echo %os_name% [Build %current_build%] & goto cmd_loop
 if /i "%ex_c%"=="Notepad" start notepad.exe & goto cmd_loop
 if /i "%ex_c%"=="Calc" start "" "%programs_root%\Calc.bat" & goto cmd_loop
-if /i "%ex_c%"=="reboot" goto reboot_screen
-if /i "%ex_c%"=="Shutdown" goto shutdown_screen
+if /i "%ex_c%"=="reboot" (
+    set "initctrl=0" 
+    set "logout_request=1"
+    set "acpi_request=2"
+    goto arslogon 
+)
+if /i "%ex_c%"=="Shutdown" (
+    set "initctrl=0" 
+    set "logout_request=1"
+    set "acpi_request=1"
+    goto arslogon 
+)
 
 start "" "%ex_c%" 2>nul || echo "%ex_c%" is not recognized.
 goto cmd_loop
@@ -1430,9 +1545,9 @@ if /i not "!img_confirm!"=="Y" goto cmd_loop
 echo [ WAIT ] Restoring system image...
 xcopy /e /y "%root_path%\Backup\*" "%root_path%\" >nul 2>&1
 echo [%date% %time%] IMAGE_RESTORE_EXECUTED >> "%log_path%" 2>nul
-echo [ OK ] System image restored. Rebooting…
+echo [ OK ] System image restored. Rebooting...
 pause
-goto boot
+set "initctrl=0" & set "logout_request=1" & set "acpi_request=2" & goto arslogon
 
 :msg_all
 set /p "m_txt=Global Message: "
@@ -1751,7 +1866,7 @@ goto cmd_loop
 :sysinfo
 cls
 echo ======================================================================================================================
-echo              ARSLANIUS SYSTEM INFORMATION
+echo                                                 ARSLANIUS SYSTEM INFORMATION
 echo ======================================================================================================================
 echo.
 
@@ -1816,7 +1931,8 @@ echo 2. start - Run a service
 echo 3. stop  - Stop a service
 echo.
 set "s_act="
-set /p "s_act=Action (1/2/3): "
+choice /C 123 /N /M "Action: "
+set "s_act=%errorlevel%"
 
 if "%s_act%"=="1" goto s_list
 if "%s_act%"=="2" goto s_start
@@ -2136,13 +2252,14 @@ if "%f_choice%"=="0" goto cmd_loop
 
 :fmx_actions
 echo Action for %f_choice%: [1] Read [2] Delete [3] Hide [4] Back
-set /p "f_act=Choice: "
+choice /C 1234 /N /M "Choice: "
+set "f_act=%errorlevel%"
 if "%f_act%"=="1" cls & type "%f_choice%" & pause & goto fmx
 if "%f_act%"=="2" del /f /q "%f_choice%" & echo [ OK ] Deleted. & pause & goto fmx
 if /i "%current_user%"=="BarOS AUTHORITY\SYSTEM" (
     if "%f_act%"=="3" attrib +h "%f_choice%" & echo [ OK ] Hidden. & pause & goto fmx
 )
-goto fmx
+if "%f_act%"=="4" goto fmx
 
 :whoami
 echo Current User: %current_user%
@@ -2170,9 +2287,6 @@ if NOT exist "%kernel_path%" (set "errors=1" & echo [ FAIL ] kernel.dll MISSING)
 
 echo [ WAIT ] Checking: REG.cfg...
 if NOT exist "%reg_path%" (set "errors=1" & echo [ FAIL ] REG.cfg MISSING) else (echo [  OK  ] REG.cfg)
-
-echo [ WAIT ] Checking: system.log...
-if NOT exist "%log_path%" (set "errors=1" & echo [ FAIL ] system.log MISSING) else (echo [  OK  ] system.log)
 
 if "%errors%"=="0" (
     echo.
@@ -2241,7 +2355,7 @@ goto cmd_loop
 
 :help
 echo Apps: Notepad, Calc (Must be installed from ArsStore), taskmgr, edit, install, regedit, ArsStore, as-pack, as-unpack, sysinfo
-echo System: Help, Lock, ping, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, cd, cat, ren, mkdir, touch, cp, mv, autorun
+echo System: Help, Lock, ping, lockmenu, sudo, cls, Shutdown, ver, fmx, whoami, reboot, clean, service, events, restore-point, restore, passwd, backup, backup-restore, ls, wait_mode, cd, cat, ren, mkdir, touch, cp, mv, autorun
 echo Admin: adduser, deluser, alert, Guest, report, reset, reboot_to_recovery, chattr, bsod, rm, netstat, ipconfig, tracert, nslookup, arp, route, loader_error, bcdboot, bcdedit
 goto cmd_loop
 
@@ -2282,11 +2396,12 @@ echo Available Apps:
 echo [ 1 ] System Scanner (Utility)
 echo [ 2 ] NotePad Lite (Office)
 echo [ 3 ] Calc (Utility)
-echo [ 0 ] Exit Store
+echo [ 4 ] Exit Store
 echo ----------------------------------------------------------------------------------------------------------------------
-set /p "s_choice=Enter App ID to Install: "
+choice /C 1234 /N /M "Enter App ID to Install: "
+set "s_choice=%errorlevel%"
 
-if "%s_choice%"=="0" goto cmd_loop
+if "%s_choice%"=="4" goto cmd_loop
 if "%s_choice%"=="1" set "app=Scanner" & set "label=app_Scanner"
 if "%s_choice%"=="2" set "app=NoteLite" & set "label=app_NoteLite"
 if "%s_choice%"=="3" set "app=Calc" & set "label=app_Calculator"
@@ -2373,19 +2488,19 @@ cls
 echo ----------------------------------------------------------------------------------------------------------------------
 echo                                         1. Explorer (FMX)    4. Regedit (REG)
 echo                                         2. Reboot            5. Control (DASH)
-echo                                         3. ArsStore          0. Exit Menu
+echo                                         3. ArsStore          6. Exit Menu
 echo ----------------------------------------------------------------------------------------------------------------------
 echo                                         [ Recent Apps: ArsStore, notepad ]
 echo ----------------------------------------------------------------------------------------------------------------------
-set /p "win_c=Search or Select: "
+choice /C 123456 /N /M "Search or Select: "
+set "win_c=%errorlevel%"
 
 if "%win_c%"=="1" goto fmx
-if "%win_c%"=="2" goto boot
+if "%win_c%"=="2" set "initctrl=0" & set "logout_request=1" & set "acpi_request=2" & goto arslogon
 if "%win_c%"=="3" goto store
 if "%win_c%"=="4" goto regedit
 if "%win_c%"=="5" goto dash
-if "%win_c%"=="0" goto cmd_loop
-goto start 
+if "%win_c%"=="6" goto cmd_loop
 
 :restore
 if not exist "%restore_root%" (
@@ -2412,7 +2527,7 @@ echo [%date% %time% INFO] RESTORE_APPLIED: %rp_sel% >> "%log_path%"
 echo [ DONE ] System restored from %rp_sel%.
 echo [ INFO ] Reboot recommended.
 pause
-goto boot
+set "initctrl=0" & set "logout_request=1" & set "acpi_request=2" & goto arslogon
 
 :bsod
 if /i "%bsod%"=="1a" (
@@ -2684,6 +2799,21 @@ if /i "%bsod%"=="12" (
     echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
     pause
     goto repair
+)
+
+if /i "%bsod%"=="DIED" (
+   cls
+   color 17
+   echo *** STOP: CRITICAL_PROCESS_DIED [0xc00000000, 0x00000000, 0x00000000, 0x00000000]
+   echo.
+   echo *** File: \ARSLANIUS 27.cmd
+   echo.
+   echo Technical information:
+   echo *** ArsLogon died
+   echo.
+   echo For support, visit: https://github.com/Armsoup/ARSLANIUS/issues
+   pause
+   goto boot
 )
 
 if /i "%bsod%"=="666" (
