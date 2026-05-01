@@ -2130,27 +2130,26 @@ goto cmd_loop
 
 :cd
 set "new_path="
-set "stop="
 set /p "new_path=Enter path: "
+if "%new_path%"=="" goto cmd_loop
 if NOT "%new_path%"==".." cd /d "%new_path%" & set "user_home=%new_path%"
 if "%new_path%"==".." (
    set "user_home=%new_path%"
-   cd /d "%user_home%" 2>nul
+   cd /d "!user_home!" 2>nul
 )
-if "%new_path%"=="" goto cmd_loop
 if errorlevel 1 (
     echo [ ERROR ] Invalid path.
     if "%user_home%"==".." (
-       set "stop=."
-       set "user_home=%stop%"
-       cd /d "%user_home%" 2>nul
+       set "new_path=."
+       set "user_home=!new_path!"
+       cd /d "!user_home!" 2>nul
     )
 ) else (
-    echo [ OK ] Directory changed to %user_home%
-    if "%user_home%"==".." (
-       set "stop=."
-       set "user_home=%stop%"
-       cd /d "%user_home%" 2>nul
+    echo [ OK ] Directory changed to !user_home!
+    if "!user_home!"==".." (
+       set "new_path=."
+       set "user_home=!new_path!"
+       cd /d "!user_home!" 2>nul
     )
 )
 pause
