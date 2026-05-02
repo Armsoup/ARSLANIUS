@@ -91,7 +91,7 @@ Included Versions
 
 • ARSLANIUS 26 - Added new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
 
-• ARSLANIUS 27 - Added autorun command, arslogon, manual and fixed bugs.
+• ARSLANIUS 27 - Added autorun command, arslogon, lockmenu, manual and fixed bugs.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
