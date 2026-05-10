@@ -43,7 +43,7 @@ System Structure
 
 ARSLANIUS/
 
-  ├─ ARSLANIUS 27.cmd
+  ├─ ARSLANIUS 28.cmd
 
   ├─ Backup/
   
@@ -94,6 +94,8 @@ Included Versions
 • ARSLANIUS 26 - Added new BSOD codes and Arslanius Boot Manager, boot animation, SysPulse clears the log, ArsStore now has a calculator, and maybe I forgot something else.
 
 • ARSLANIUS 27 - Added autorun command, arslogon, lockmenu, manual and fixed bugs.
+
+• ARSLANIUS 28 - Added set and echo commands, new BSoD code, and updated arslogon.
 ---
 • ATTENTION! Support for the versions on which the [server version](https://github.com/Armsoup/ARSLANIUS_Server) is based will continue until support for that server version is discontinued.
 
@@ -113,14 +115,14 @@ Unsupported versions:
 
 · ARSLANIUS 23
 
-  These versions are no longer maintained. Please use the latest release (ARSLANIUS 27) for an up-to-date and secure experience.
+  These versions are no longer maintained. Please use the latest release (ARSLANIUS 28) for an up-to-date and secure experience.
   
   What does it mean is not supported? This means that all errors found will not be corrected only if they are not critical
   
 How to Run
 
 1. Copy the ARSLANIUS folder to any location (USB recommended).
-2. Launch ARSLANIUS 27.cmd.
+2. Launch ARSLANIUS 28.cmd.
 3. On first boot, press R to generate the kernel.
 4. Log in as SYSTEM ADMINISTRATOR / Jiupolaqmn_isArslanius-lo
 5. Create a user account.
